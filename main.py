@@ -11,6 +11,7 @@ from apk_parser import ApkParser
 from enum import IntEnum
 from tkinter import filedialog, Canvas
 from pathlib import Path
+from threading import Thread
 
 # global vars holding tk, window, style and canvas instances
 g_root = tk.Tk()
@@ -33,26 +34,34 @@ class ECoreElements(IntEnum):
     NONE = 0,
     LOGGER = 1,
     APK_INFO_LABEL = 2,
-    APK_ICON_VIEW = 3
+    APK_ICON_VIEW = 3,
+    PROGRESSBAR = 4
 
 def redirect_stdout(stdout) -> None:
     # g_logger.external(stdout)
     g_logger.info(stdout)
     return
 
-def decompile_apk_callback() -> None:
+def decompile_apk_callback(threaded=False) -> None:
+    if threaded == False:
+        thread = Thread(target=decompile_apk_callback, args=(True,))
+        thread.start()
+        return
+
     global g_current_file, g_apk_parser
 
-    # loading sample
     file_path = filedialog.askopenfilename()
 
-    if file_path is None: return
+    if file_path == '': return
 
     _, file_name = os.path.split(file_path)
     g_current_file = file_path
 
     info_label = g_app.get_element_by_opt_id(ECoreElements.APK_INFO_LABEL)
     icon_view = g_app.get_element_by_opt_id(ECoreElements.APK_ICON_VIEW)
+    progressbar = g_app.get_element_by_opt_id(ECoreElements.PROGRESSBAR)
+
+    progressbar.start()
 
     g_apk_parser = ApkParser(g_current_file, info_label, icon_view)
     g_apk_parser.parse()
@@ -70,11 +79,18 @@ def decompile_apk_callback() -> None:
         out, err = p.communicate()
         redirect_stdout(out)
 
+    progressbar.stop()
+
     # logging
     g_logger.info(f"[+] Decompiled apk: {g_current_file}\n")
 
     
-def recompile_apk_callback() -> None:
+def recompile_apk_callback(threaded=False) -> None:
+    if threaded == False:
+        thread = Thread(target=decompile_apk_callback, args=(True,))
+        thread.start()
+        return
+
     global g_current_file, g_apk_parser
 
     _, file_name = os.path.split(g_current_file)
@@ -82,6 +98,9 @@ def recompile_apk_callback() -> None:
     # apktool b bar -o new_bar.apk
     recompile_cmd = f'java -Xmx1024m -jar {str(Path.cwd())}\\vendor\\apktool\\apktool.jar' \
         f" b {str(Path.cwd())}\\decompiled\\{file_name}_decompiled -o {str(Path.cwd())}\\build\\{file_name}_recompiled.apk"
+
+    progressbar = g_app.get_element_by_opt_id(ECoreElements.PROGRESSBAR)
+    progressbar.start()
 
     # re-packing apk
     with subprocess.Popen(
@@ -111,6 +130,10 @@ def recompile_apk_callback() -> None:
         g_logger.info(f"[+] Signed apk: {g_current_file}_recompiled\n")
     else:
         g_logger.warning(f'[!] Failed to sign apk: {g_current_file}_recompiled\n')
+        progressbar.stop()
+        return
+
+    progressbar.stop()
 
     # logging
     g_logger.info(f"[+] Re-compiled apk: {g_current_file}_recompiled\n")
@@ -130,7 +153,10 @@ def construct_gui() -> None:
 
     def setup_logbox(logger):
         for color in logbox_level_colors.items(): 
-            logbox.tag_config(color[0], foreground=color[1]["foreground"], background=color[1]["background"])
+            logbox.tag_config(
+                color[0], foreground=color[1]["foreground"],
+                background=color[1]["background"]
+            )
             
     g_logger.install_output(
         LogOutput(
@@ -166,6 +192,11 @@ def construct_gui() -> None:
     g_app.create_image(
         g_root, 20, 20 + 150, 0, 32, 32, 
         ECoreElements.APK_ICON_VIEW
+    )
+
+    g_app.create_progressbar(
+        g_root, 20, 440, 0, 0,
+        ECoreElements.PROGRESSBAR
     )
 
     g_canvas.pack()
