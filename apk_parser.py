@@ -11,11 +11,17 @@ class ApkParser:
 
     # update apk info (might be useful to check apk info afrer making changes to it)
     def set_apk(self, apk_path: str) -> None:
-        self.apk_path = apk_path
-        self.apk = APK(apk_path)
-    
+        try:
+            self.apk_path = apk_path
+            self.apk = APK(apk_path)
+        except Exception as ex:
+            g_logger.error(f'[!] {ex}\n')
+            
     # apk parsing routine
-    def parse(self) -> None:
+    def parse(self) -> bool:
+        if not hasattr(self, 'apk') or self.apk.is_valid_APK() == False:
+            return False
+
         info_string = f'package: {self.apk.package}\n' \
             f'version: {self.apk.version_name}\n' \
             f'version code: {self.apk.version_code}\n' \
@@ -28,8 +34,9 @@ class ApkParser:
         icon = tk.PhotoImage(data=self.apk.icon_data, format='png')
         self.icon_view.configure(image=icon)
         self.icon_view.image=icon
-
+   
         g_logger.info('[+] Parsed apk info\n')
+        return True
 
     # checks whether apk is signed or not
     def is_signed(self, apk_path='') -> bool:

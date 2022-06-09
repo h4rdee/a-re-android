@@ -64,7 +64,11 @@ def decompile_apk_callback(threaded=False) -> None:
     progressbar.start()
 
     g_apk_parser = ApkParser(g_current_file, info_label, icon_view)
-    g_apk_parser.parse()
+
+    if g_apk_parser.parse() != True:
+        progressbar.stop()
+        g_logger.error(f"[-] Failed to decompile: {g_current_file}\n")
+        return
 
     g_root.title(f'A-RE: Android ({g_current_file})')
 
@@ -129,7 +133,7 @@ def recompile_apk_callback(threaded=False) -> None:
     if g_apk_parser.is_signed():
         g_logger.info(f"[+] Signed apk: {g_current_file}_recompiled\n")
     else:
-        g_logger.warning(f'[!] Failed to sign apk: {g_current_file}_recompiled\n')
+        g_logger.error(f'[!] Failed to sign apk: {g_current_file}_recompiled\n')
         progressbar.stop()
         return
 
