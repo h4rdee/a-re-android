@@ -46,27 +46,35 @@ class Window:
                 "[!] skipping element: external elements must have an id\n"
             )
 
-    def create_button(self, root, xpos: int, ypos: int, label: str, callback, width=72, height=30, opt_id=0) -> None:
+    def create_button(self, root, xpos: int, ypos: int, label: str, 
+        callback, width=72, height=30, opt_id=0) -> ttk.Button:
+
         temp_btn = ttk.Button(root, text=label, command=callback)
         temp_btn.place(x=xpos, y=ypos, width=width, height=height)
         if opt_id != 0:
             self.elements[opt_id] = temp_btn
 
-    def create_label(self, root, xpos: int, ypos: int, label: str, opt_id=0) -> None:
+        return temp_btn
+
+    def create_label(self, root, xpos: int, ypos: int, label: str, opt_id=0) -> ttk.Label:
         temp_lbl = ttk.Label(root, text=label)
         temp_lbl.place(x=xpos, y=ypos)
         if opt_id != 0:
             self.elements[opt_id] = temp_lbl
 
-    def create_editbox(self, root, xpos: int, ypos: int, var: str, opt_id=0) -> None:
+        return temp_lbl
+
+    def create_editbox(self, root, xpos: int, ypos: int, var: str, opt_id=0) -> ttk.Entry:
         temp_ebx = ttk.Entry(root)
         temp_ebx.insert(0, var)
         temp_ebx.place(x=xpos, y=ypos, width=70, height=30)
         if opt_id != 0:
             self.elements[opt_id] = temp_ebx
 
+        return temp_ebx
+
     def create_slider(self, root, xpos: int, ypos: int,
-        min: float, max: float, orient: str, callback, opt_id=0) -> None:
+        min: float, max: float, orient: str, callback, opt_id=0) -> ttk.Scale:
 
         temp_sld = ttk.Scale(
             root, command=callback, 
@@ -76,13 +84,17 @@ class Window:
         if opt_id != 0:
             self.elements[opt_id] = temp_sld
 
-    def create_combobox(self, root, xpos: int, ypos: int, items, callback, opt_id=0) -> None:
+        return temp_sld
+
+    def create_combobox(self, root, xpos: int, ypos: int, items, callback, opt_id=0) -> ttk.Combobox:
         temp_cbx = ttk.Combobox(root, values=items)
         temp_cbx.place(x=xpos, y=ypos, width=165)
         if opt_id != 0:
             self.elements[opt_id] = temp_cbx
 
-    def create_logbox(self, root, xpos: int, ypos: int, w: int, h: int, opt_id=0) -> None:
+        return temp_cbx
+
+    def create_logbox(self, root, xpos: int, ypos: int, w: int, h: int, opt_id=0) -> tk.Text:
         temp_tbx = tk.Text(root, width=w, height=h)
 
         scroll_y = ttk.Scrollbar(temp_tbx)
@@ -104,7 +116,9 @@ class Window:
         if opt_id != 0:
             self.elements[opt_id] = temp_tbx
 
-    def create_image(self, root, xpos: int, ypos: int, data, w: int, h: int, opt_id=0) -> None:
+        return temp_tbx
+
+    def create_image(self, root, xpos: int, ypos: int, data, w: int, h: int, opt_id=0) -> tk.Label: # whatever
         if data == 0:
             temp_img = tk.PhotoImage(format='png', height=h, width=w)
         else:
@@ -116,7 +130,9 @@ class Window:
         if opt_id != 0:
             self.elements[opt_id] = temp_lbl
 
-    def create_progressbar(self, root, xpos: int, ypos: int, w: int, h: int, opt_id=0) -> None:
+        return temp_lbl
+
+    def create_progressbar(self, root, xpos: int, ypos: int, w: int, h: int, opt_id=0) -> ttk.Progressbar:
         temp_pb = ttk.Progressbar(
             root, orient='horizontal',
             mode='indeterminate',
@@ -127,20 +143,26 @@ class Window:
         if opt_id != 0:
             self.elements[opt_id] = temp_pb
 
-    def create_tab_control(self, root, xpos: int, ypos: int, w: int, h: int, opt_id=0) -> None:
+        return temp_pb
+
+    def create_tab_control(self, root, xpos: int, ypos: int, w: int, h: int, opt_id=0) -> ttk.Notebook:
         temp_tabbar = ttk.Notebook(root)
         temp_tabbar.place(x=xpos, y=ypos)
 
         if opt_id != 0:
             self.elements[opt_id] = temp_tabbar
 
-    def create_tab(self, root, text: str, opt_id=0) -> None:
+        return temp_tabbar
+
+    def create_tab(self, root, text: str, opt_id=0) -> ttk.Frame:
         temp_tab = ttk.Frame(root, width=self.w-340, height=self.h-70)
         root.add(temp_tab, text=text)
         # root.pack(expand=1, fill="both")
 
         if opt_id != 0:
             self.elements[opt_id] = temp_tab
+
+        return temp_tab
 
     
     #def create_line(self, root, xpos: int, ypos: int, xposf: int, yposf: int, width: int, opt_id=0):
