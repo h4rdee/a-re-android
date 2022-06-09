@@ -1,13 +1,15 @@
 # todo:
 # - layout scheme for elements
 # - redirect output from stdout of subprocess to logger (properly, 'external'-tag-wise)
+# - refactor main.py
 
 import subprocess
 import os
 
 from gui import Window, tk, ttk, elements_layout
-from logger import Logger, g_logger, LogOutput, LogLevel
+from logger import g_logger, LogOutput, LogLevel
 from apk_parser import ApkParser
+from plugins import Plugin, PluginsManager
 from enum import IntEnum
 from tkinter import filedialog, Canvas
 from pathlib import Path
@@ -44,9 +46,10 @@ class ECoreElements(IntEnum):
     APK_INFO_LABEL = 2,
     APK_ICON_VIEW = 3,
     PROGRESS_BAR = 4,
-    TAB_CONTROL = 5,
-    GENERAL_TAB = 6,
-    PLUGINS_TAB = 7
+    TAB_CONTROL_ROOT = 5,
+    TAB_CONTROL_PLUGINS = 6,
+    GENERAL_TAB = 7,
+    PLUGINS_TAB = 8,
 
 def redirect_stdout(stdout) -> None:
     # g_logger.external(stdout)
@@ -54,7 +57,7 @@ def redirect_stdout(stdout) -> None:
     return
 
 def decompile_apk_callback(threaded=False) -> None:
-    if threaded == False:
+    if threaded == False: # hack, i'm too lazy to asyncify tkinter
         thread = Thread(target=decompile_apk_callback, args=(True,))
         thread.start()
         return
@@ -101,7 +104,7 @@ def decompile_apk_callback(threaded=False) -> None:
 
     
 def recompile_apk_callback(threaded=False) -> None:
-    if threaded == False:
+    if threaded == False: # hack, i'm too lazy to asyncify tkinter
         thread = Thread(target=decompile_apk_callback, args=(True,))
         thread.start()
         return
@@ -114,7 +117,7 @@ def recompile_apk_callback(threaded=False) -> None:
     recompile_cmd = f'java -Xmx1024m -jar {str(Path.cwd())}\\vendor\\apktool\\apktool.jar' \
         f" b {str(Path.cwd())}\\decompiled\\{file_name}_decompiled -o {str(Path.cwd())}\\build\\{file_name}_recompiled.apk"
 
-    progressbar = g_app.get_element_by_opt_id(ECoreElements.PROGRESSBAR)
+    progressbar = g_app.get_element_by_opt_id(ECoreElements.PROGRESS_BAR)
     progressbar.start()
 
     # re-packing apk
@@ -157,14 +160,18 @@ def recompile_apk_callback(threaded=False) -> None:
 def construct_gui() -> None:
     global g_win_w, g_win_h
 
-    g_app.create_tab_control(g_root, 20, 20, g_win_w, g_win_h, ECoreElements.TAB_CONTROL)
-    tab_bar = g_app.get_element_by_opt_id(ECoreElements.TAB_CONTROL)
+    tab_bar_root = g_app.create_tab_control(
+        g_root, 20, 20, g_win_w, g_win_h, 
+        ECoreElements.TAB_CONTROL_ROOT
+    )
 
-    g_app.create_tab(tab_bar, 'General', ECoreElements.GENERAL_TAB)
-    general_tab = g_app.get_element_by_opt_id(ECoreElements.GENERAL_TAB)
+    general_tab = g_app.create_tab(tab_bar_root, 'General', ECoreElements.GENERAL_TAB)
+    plugins_tab = g_app.create_tab(tab_bar_root, 'Plugins', ECoreElements.PLUGINS_TAB)
 
-    g_app.create_tab(tab_bar, 'Plugins', ECoreElements.PLUGINS_TAB)
-    plugins_tab = g_app.get_element_by_opt_id(ECoreElements.PLUGINS_TAB)
+    tab_bar_plugins = g_app.create_tab_control(
+        plugins_tab, 20, 20, g_win_w, g_win_h, 
+        ECoreElements.TAB_CONTROL_PLUGINS
+    )
 
     g_app.create_logbox(g_root, 600, 20, 280, 460, ECoreElements.LOGGER)
     logbox = g_app.get_element_by_opt_id(ECoreElements.LOGGER)
@@ -195,6 +202,8 @@ def construct_gui() -> None:
         "A-RE android: android apps RE utility\n"
         "https://github.com/h4rdee/a-re-android\n\n"
     )
+
+    plugins_manager = PluginsManager(g_app, tab_bar_plugins)
 
     g_app.create_button(
         general_tab, 20, 20, "Decompile APK", decompile_apk_callback,

@@ -1,0 +1,11 @@
+{
+    "plugin_name": "Cocos2D",
+    "plugin_desc": "Unpack & repack Cocos2D jsc/jsc2/luac files",
+    "plugin_author": "hardee",
+    "plugin_doc": "",
+    "plugin_entry": "cocos2d.py",
+    "plugin_ver": {
+        "major": 1,
+        "minor": 0
+    }
+}
