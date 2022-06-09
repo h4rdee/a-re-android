@@ -120,12 +120,28 @@ class Window:
         temp_pb = ttk.Progressbar(
             root, orient='horizontal',
             mode='indeterminate',
-            length=self.w+10
+            length=self.w-330
         )
         temp_pb.place(x=xpos, y=ypos)
         
         if opt_id != 0:
             self.elements[opt_id] = temp_pb
+
+    def create_tab_control(self, root, xpos: int, ypos: int, w: int, h: int, opt_id=0) -> None:
+        temp_tabbar = ttk.Notebook(root)
+        temp_tabbar.place(x=xpos, y=ypos)
+
+        if opt_id != 0:
+            self.elements[opt_id] = temp_tabbar
+
+    def create_tab(self, root, text: str, opt_id=0) -> None:
+        temp_tab = ttk.Frame(root, width=self.w-340, height=self.h-70)
+        root.add(temp_tab, text=text)
+        # root.pack(expand=1, fill="both")
+
+        if opt_id != 0:
+            self.elements[opt_id] = temp_tab
+
     
     #def create_line(self, root, xpos: int, ypos: int, xposf: int, yposf: int, width: int, opt_id=0):
     #    temp_ln = Canvas(root).create_line(xpos, ypos, xposf, yposf, width=width, fill="white")
