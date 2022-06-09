@@ -25,7 +25,12 @@ g_root.tk.call(
 g_win_w = 900
 g_win_h = 500
 
+# use breeze-dark theme
 g_style.theme_use('breeze-dark')
+
+# remove wanky dashed line which appears when tab is selected
+g_style.configure("Tab", focuscolor=g_style.configure(".")["background"])
+
 g_app = Window(g_root, g_win_w, g_win_h, "A-RE: Android")
 g_canvas = Canvas(g_root, width=g_win_w, height=g_win_h)
 
