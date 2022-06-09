@@ -22,9 +22,12 @@ g_root.tk.call(
     "\\themes\\breeze-dark\\breeze-dark.tcl"
 )
 
+g_win_w = 900
+g_win_h = 500
+
 g_style.theme_use('breeze-dark')
-g_app = Window(g_root, 900, 500, "A-RE: Android")
-g_canvas = Canvas(g_root, width=900, height=500)
+g_app = Window(g_root, g_win_w, g_win_h, "A-RE: Android")
+g_canvas = Canvas(g_root, width=g_win_w, height=g_win_h)
 
 g_apk_parser = None
 g_current_file = None
@@ -35,7 +38,10 @@ class ECoreElements(IntEnum):
     LOGGER = 1,
     APK_INFO_LABEL = 2,
     APK_ICON_VIEW = 3,
-    PROGRESSBAR = 4
+    PROGRESS_BAR = 4,
+    TAB_CONTROL = 5,
+    GENERAL_TAB = 6,
+    PLUGINS_TAB = 7
 
 def redirect_stdout(stdout) -> None:
     # g_logger.external(stdout)
@@ -59,7 +65,7 @@ def decompile_apk_callback(threaded=False) -> None:
 
     info_label = g_app.get_element_by_opt_id(ECoreElements.APK_INFO_LABEL)
     icon_view = g_app.get_element_by_opt_id(ECoreElements.APK_ICON_VIEW)
-    progressbar = g_app.get_element_by_opt_id(ECoreElements.PROGRESSBAR)
+    progressbar = g_app.get_element_by_opt_id(ECoreElements.PROGRESS_BAR)
 
     progressbar.start()
 
@@ -144,6 +150,17 @@ def recompile_apk_callback(threaded=False) -> None:
 
 
 def construct_gui() -> None:
+    global g_win_w, g_win_h
+
+    g_app.create_tab_control(g_root, 20, 20, g_win_w, g_win_h, ECoreElements.TAB_CONTROL)
+    tab_bar = g_app.get_element_by_opt_id(ECoreElements.TAB_CONTROL)
+
+    g_app.create_tab(tab_bar, 'General', ECoreElements.GENERAL_TAB)
+    general_tab = g_app.get_element_by_opt_id(ECoreElements.GENERAL_TAB)
+
+    g_app.create_tab(tab_bar, 'Plugins', ECoreElements.PLUGINS_TAB)
+    plugins_tab = g_app.get_element_by_opt_id(ECoreElements.PLUGINS_TAB)
+
     g_app.create_logbox(g_root, 600, 20, 280, 460, ECoreElements.LOGGER)
     logbox = g_app.get_element_by_opt_id(ECoreElements.LOGGER)
 
@@ -175,32 +192,32 @@ def construct_gui() -> None:
     )
 
     g_app.create_button(
-        g_root, 20, 20, "Decompile APK", decompile_apk_callback,
+        general_tab, 20, 20, "Decompile APK", decompile_apk_callback,
         elements_layout["button"]["width"]
     )
 
     g_app.create_button(
-        g_root, 20 + elements_layout["button"]["width"] * 1, 20, "Re-build APK",  
+        general_tab, 20 + elements_layout["button"]["width"] * 1, 20, "Re-build APK",  
         recompile_apk_callback, elements_layout["button"]["width"]
     )
 
     g_app.create_label(
-        g_root, 20, 20 + 50, 'APK info:'
+        general_tab, 20, 20 + 50, 'APK info:'
     )
 
     g_app.create_label(
-        g_root, 20, 20 + 70, '< Load APK >',
+        general_tab, 20, 20 + 70, '< Load APK >',
         ECoreElements.APK_INFO_LABEL
     )
 
     g_app.create_image(
-        g_root, 20, 20 + 150, 0, 32, 32, 
+        general_tab, 20, 20 + 150, 0, 32, 32, 
         ECoreElements.APK_ICON_VIEW
     )
 
     g_app.create_progressbar(
-        g_root, -6, -7, 0, 0,
-        ECoreElements.PROGRESSBAR
+        general_tab, -6, -7, 0, 0,
+        ECoreElements.PROGRESS_BAR
     )
 
     g_canvas.pack()
