@@ -28,6 +28,8 @@ class Window:
         root.geometry(align_str)
         root.resizable(width=False, height=False)
 
+        self.w = width
+        self.h = height
         self.log_font = tkFont.Font(family="Helvetica", size=10)
 
     def get_element_by_opt_id(self, opt_id) -> Any:
@@ -118,7 +120,7 @@ class Window:
         temp_pb = ttk.Progressbar(
             root, orient='horizontal',
             mode='indeterminate',
-            length=560
+            length=self.w+10
         )
         temp_pb.place(x=xpos, y=ypos)
         

@@ -195,7 +195,7 @@ def construct_gui() -> None:
     )
 
     g_app.create_progressbar(
-        g_root, 20, 440, 0, 0,
+        g_root, -6, -7, 0, 0,
         ECoreElements.PROGRESSBAR
     )
 
