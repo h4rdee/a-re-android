@@ -113,6 +113,17 @@ class Window:
 
         if opt_id != 0:
             self.elements[opt_id] = temp_lbl
+
+    def create_progressbar(self, root, xpos: int, ypos: int, w: int, h: int, opt_id=0) -> None:
+        temp_pb = ttk.Progressbar(
+            root, orient='horizontal',
+            mode='indeterminate',
+            length=560
+        )
+        temp_pb.place(x=xpos, y=ypos)
+        
+        if opt_id != 0:
+            self.elements[opt_id] = temp_pb
     
     #def create_line(self, root, xpos: int, ypos: int, xposf: int, yposf: int, width: int, opt_id=0):
     #    temp_ln = Canvas(root).create_line(xpos, ypos, xposf, yposf, width=width, fill="white")
