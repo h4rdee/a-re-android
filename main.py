@@ -171,7 +171,7 @@ def construct_gui() -> None:
 
     g_logger.special(
         "A-RE android: android apps RE utility\n"
-        "https://github.com/h4rdee/a-re\n\n"
+        "https://github.com/h4rdee/a-re-android\n\n"
     )
 
     g_app.create_button(
