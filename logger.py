@@ -13,7 +13,14 @@ class LogLevelObject:
         # return "[" + self.tag + "] " + txt
 
     def install(self, logger):
-        setattr(logger, self.name.lower(), (lambda message: logger.log(self.modify_message(message), self.tag)))
+        setattr(
+            logger, self.name.lower(), 
+            (
+                lambda message: logger.log(
+                    self.modify_message(message), self.tag
+                )
+            )
+        )
 
 class LogLevel:
     INFO     = LogLevelObject(0, "Info")
