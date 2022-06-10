@@ -1,6 +1,7 @@
 # A-RE Android
 Android applications reverse-engineering utility (pretty simple at the moment, but who knows whats coming up next..) <br><br>
-![image](https://user-images.githubusercontent.com/37783231/172811025-697fc6ce-c3b8-4327-bdd9-333524eadac0.png)
+![image](https://user-images.githubusercontent.com/37783231/172968610-66a7b7bb-c127-4e5f-9d6a-7ea3d051cb53.png)
+
 
 ## Current features:
 - APK decompiling (de-odexing, unpacking resources etc), powered by [ApkTool](https://github.com/iBotPeaches/Apktool)
