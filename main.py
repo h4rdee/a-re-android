@@ -52,9 +52,7 @@ class ECoreElements(IntEnum):
     PLUGINS_TAB = 8,
 
 def redirect_stdout(stdout) -> None:
-    # g_logger.external(stdout)
-    g_logger.info(stdout)
-    return
+    g_logger.external(stdout)
 
 def decompile_apk_callback(threaded=False) -> None:
     if threaded == False: # hack, i'm too lazy to asyncify tkinter
@@ -177,11 +175,12 @@ def construct_gui() -> None:
     logbox = g_app.get_element_by_opt_id(ECoreElements.LOGGER)
 
     logbox_level_colors = {
-        LogLevel.INFO.tag:     { "foreground": "#FFFFFF", "background": None },
-        LogLevel.EXTERNAL.tag: { "foreground": "#00A6D6", "background": None },
-        LogLevel.SPECIAL.tag:  { "foreground": "#AAFF00", "background": None },
-        LogLevel.WARNING.tag:  { "foreground": "yellow",  "background": None },
-        LogLevel.ERROR.tag:    { "foreground": "red", "background": "black"  }
+        LogLevel.INFO.tag:     { "foreground": "#FFFFFF", "background": None    },
+        LogLevel.EXTERNAL.tag: { "foreground": "#39912D", "background": None    },
+        LogLevel.SPECIAL.tag:  { "foreground": "#AAFF00", "background": None    },
+        LogLevel.PLUGIN.tag:   { "foreground": "#00FFFF", "background": None    },
+        LogLevel.WARNING.tag:  { "foreground": "yellow" , "background": None    },
+        LogLevel.ERROR.tag:    { "foreground": "red"    , "background": "black" }
     }
 
     def setup_logbox(logger):

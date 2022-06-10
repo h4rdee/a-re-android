@@ -6,7 +6,7 @@ class LogLevelObject:
     def __init__(self, priority, name):
         self.priority = priority
         self.name = name
-        self.tag = str(self.name.lower()[0])
+        self.tag = str(self.name.lower()[0:2])
 
     def modify_message(self, txt):
         return txt
@@ -16,11 +16,12 @@ class LogLevelObject:
         setattr(logger, self.name.lower(), (lambda message: logger.log(self.modify_message(message), self.tag)))
 
 class LogLevel:
-    INFO = LogLevelObject(0, "Info")
-    EXTERNAL = LogLevelObject(0, "External")
-    SPECIAL = LogLevelObject(1, "Special")
-    WARNING = LogLevelObject(2, "Warning")
-    ERROR = LogLevelObject(3, "Error")
+    INFO     = LogLevelObject(0, "Info")
+    EXTERNAL = LogLevelObject(1, "External")
+    SPECIAL  = LogLevelObject(2, "Special")
+    PLUGIN   = LogLevelObject(3, "Plugin")
+    WARNING  = LogLevelObject(4, "Warning")
+    ERROR    = LogLevelObject(5, "Error")
 
 class LogOutput:
     on_receive = None
@@ -48,6 +49,7 @@ class Logger:
         self.register_log_level(LogLevel.INFO)
         self.register_log_level(LogLevel.EXTERNAL)
         self.register_log_level(LogLevel.SPECIAL)
+        self.register_log_level(LogLevel.PLUGIN)
         self.register_log_level(LogLevel.WARNING)
         self.register_log_level(LogLevel.ERROR)
 
