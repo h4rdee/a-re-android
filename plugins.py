@@ -63,7 +63,7 @@ class Plugin:
         try:
             plugin_module = self.plugin_path + f"\\{self.json_cfg['plugin_entry']}"
             plugin = SourceFileLoader(os.path.basename(self.plugin_path), plugin_module).load_module()
-            plugin.__init__(gui, ui_root, logger)
+            plugin.__init__(self, gui, ui_root, logger)
         except Exception as ex:
             g_logger.warning(f'[!] {ex}\n')
             g_logger.error(f'[-] Failed to load {self.get_plugin_name()} plugin\n')
@@ -73,22 +73,22 @@ class PluginsManager:
     plugins_tabs = []
 
     def __init__(self, ui_root, tab_bar) -> None:
-        g_logger.info('[+] Scanning for plugins..\n')
+        g_logger.info('[>] Scanning for plugins..\n')
 
         subfolders = [ f.path for f in os.scandir(str(Path.cwd()) + "\\plugins") if f.is_dir() ]
 
         for folder in subfolders:
             plugin_name = os.path.basename(folder)
-            g_logger.info(f'[+] Scanning {plugin_name}..\n')
+            g_logger.info(f'[>] Scanning {plugin_name}..\n')
             plugin = Plugin(folder)
 
             if plugin.is_valid_plugin() == True:
-                g_logger.info(f'[+] {plugin_name} is valid plugin\n')
+                g_logger.info(f'[+] {plugin.get_plugin_name()} is valid plugin\n')
 
                 self.plugins_list.append(plugin)
-
-                tab = ui_root.create_tab(tab_bar, plugin.get_plugin_name())
-
+                tab = ui_root.create_tab(
+                    tab_bar, 520, 360, plugin.get_plugin_name()
+                )
                 self.plugins_tabs.append(tab)
 
                 ui_root.create_label(
