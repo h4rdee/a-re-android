@@ -163,8 +163,15 @@ def construct_gui() -> None:
         ECoreElements.TAB_CONTROL_ROOT
     )
 
-    general_tab = g_app.create_tab(tab_bar_root, 'General', ECoreElements.GENERAL_TAB)
-    plugins_tab = g_app.create_tab(tab_bar_root, 'Plugins', ECoreElements.PLUGINS_TAB)
+    general_tab = g_app.create_tab(
+        tab_bar_root, g_win_w-340, g_win_h-70,
+        'General', ECoreElements.GENERAL_TAB
+    )
+
+    plugins_tab = g_app.create_tab(
+        tab_bar_root, g_win_w-340, g_win_h-70,
+        'Plugins', ECoreElements.PLUGINS_TAB
+    )
 
     tab_bar_plugins = g_app.create_tab_control(
         plugins_tab, 20, 20, g_win_w, g_win_h, 
