@@ -154,8 +154,8 @@ class Window:
 
         return temp_tabbar
 
-    def create_tab(self, root, text: str, opt_id=0) -> ttk.Frame:
-        temp_tab = ttk.Frame(root, width=self.w-340, height=self.h-70)
+    def create_tab(self, root, w: int, h: int, text: str, opt_id=0) -> ttk.Frame:
+        temp_tab = ttk.Frame(root, width=w, height=h)
         root.add(temp_tab, text=text)
         # root.pack(expand=1, fill="both")
 
