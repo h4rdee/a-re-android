@@ -15,7 +15,7 @@ class ApkParser:
             self.apk_path = apk_path
             self.apk = APK(apk_path)
         except Exception as ex:
-            g_logger.error(f'[!] {ex}\n')
+            g_logger.error(f'[ !] {ex}\n')
             
     # apk parsing routine
     def parse(self) -> bool:

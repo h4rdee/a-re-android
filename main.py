@@ -145,7 +145,7 @@ def recompile_apk_callback(threaded=False) -> None:
     if g_apk_parser.is_signed():
         g_logger.info(f"[+] Signed apk: {g_current_file}_recompiled\n")
     else:
-        g_logger.error(f'[!] Failed to sign apk: {g_current_file}_recompiled\n')
+        g_logger.error(f'[ !] Failed to sign apk: {g_current_file}_recompiled\n')
         progressbar.stop()
         return
 
