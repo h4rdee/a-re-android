@@ -23,8 +23,6 @@ class Cocos2D:
             thread.start()
             return
 
-        self.xxtea_key.set('#EjjdGNwsp3)VB8D') # remove me
-
         if len(self.xxtea_key.get()) != 16:
             self.logger.plugin(
                 f'[!] [{self.plugin_obj.get_plugin_name()}]' \
