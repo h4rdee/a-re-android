@@ -1,6 +1,8 @@
 # A-RE Android
-Android applications reverse-engineering utility (pretty simple at the moment, but who knows whats coming up next..) <br><br>
+Android applications reverse-engineering utility <br> (pretty simple at the moment, but who knows whats coming up next..) <br><br><br>
 ![image](https://user-images.githubusercontent.com/37783231/172968610-66a7b7bb-c127-4e5f-9d6a-7ea3d051cb53.png)
+![image](https://user-images.githubusercontent.com/37783231/172980979-3919634b-f049-4978-828b-2bdb7ce30e6d.png)
+
 
 
 ## Current features:
