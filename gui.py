@@ -35,7 +35,7 @@ class Window:
     def get_element_by_opt_id(self, opt_id) -> Any:
         el = self.elements.get(opt_id)
         if el is None:
-            g_logger.error(f"[!] element with opt_id {opt_id} not found\n")
+            g_logger.error(f"[ !] element with opt_id {opt_id} not found\n")
         return el
 
     def push_external_element(self, element, id: int) -> None:
@@ -43,7 +43,7 @@ class Window:
             self.elements[id] = element
         else:
             g_logger.warning(
-                "[!] skipping element: external elements must have an id\n"
+                "[ !] skipping element: external elements must have an id\n"
             )
 
     def create_button(self, root, xpos: int, ypos: int, label: str, 
@@ -64,10 +64,13 @@ class Window:
 
         return temp_lbl
 
-    def create_editbox(self, root, xpos: int, ypos: int, var: str, opt_id=0) -> ttk.Entry:
-        temp_ebx = ttk.Entry(root)
-        temp_ebx.insert(0, var)
-        temp_ebx.place(x=xpos, y=ypos, width=70, height=30)
+    def create_editbox(self, root, xpos: int, ypos: int, var: tk.StringVar, 
+        width=70, height=30, opt_id=0) -> ttk.Entry:
+
+        temp_ebx = ttk.Entry(root, textvariable=var)
+        temp_ebx.insert(0, var.get())
+        temp_ebx.place(x=xpos, y=ypos, width=width, height=height)
+
         if opt_id != 0:
             self.elements[opt_id] = temp_ebx
 
