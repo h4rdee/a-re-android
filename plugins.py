@@ -95,7 +95,7 @@ class PluginsManager:
                     self.plugins_tabs[-1], 20, 20, 
                     f'{plugin.get_plugin_name()} v{plugin.get_plugin_version_string()} ' +
                     f'by {plugin.get_plugin_author()}\n{plugin.get_plugin_description()}\n' +
-                    f'documentation: {plugin.get_plugin_documentation_link()}'
+                    f'Documentation: \n'
                 )
 
                 plugin.load(ui_root, tab_bar, g_logger)
