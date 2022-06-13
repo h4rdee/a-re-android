@@ -57,7 +57,7 @@ def decompile_apk_callback(app, threaded=False) -> None:
 
     # decompiling file
     with subprocess.Popen(
-        decompile_cmd, shell=True, stdout=subprocess.PIPE, 
+        decompile_cmd, shell=False, stdout=subprocess.PIPE, 
         bufsize=1, universal_newlines=True
     ) as p:
         out, err = p.communicate()
@@ -93,7 +93,7 @@ def recompile_apk_callback(app, threaded=False) -> None:
 
     # re-packing apk
     with subprocess.Popen(
-        recompile_cmd, shell=True, stdout=subprocess.PIPE, 
+        recompile_cmd, shell=False, stdout=subprocess.PIPE, 
         bufsize=1, universal_newlines=True
     ) as p:
         out, err = p.communicate()
@@ -106,11 +106,11 @@ def recompile_apk_callback(app, threaded=False) -> None:
 
     # signing packed apk
     with subprocess.Popen(
-        sign_cmd, shell=True, stdout=subprocess.PIPE, 
+        sign_cmd, shell=False, stdout=subprocess.PIPE, 
         bufsize=1, universal_newlines=True
     ) as p:
         out, err = p.communicate()
-        utils.redirect_stdout(app.get_logger(), out)
+        app.get_logger().external(out)
 
     # check if signed successfully
     g_apk_parser.set_apk(f'{str(Path.cwd())}\\build\\{file_name}_recompiled.apk')
