@@ -2,7 +2,7 @@
     "plugin_name": "Cocos2D",
     "plugin_desc": "Unpack & repack Cocos2D jsc/jsc2/luac files",
     "plugin_author": "hardee",
-    "plugin_doc": "",
+    "plugin_doc": "https://github.com/h4rdee/a-re-android/wiki/%5BPlugin%5D-Cocos2D",
     "plugin_entry": "cocos2d.py",
     "plugin_ver": {
         "major": 0,
