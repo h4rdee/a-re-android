@@ -9,8 +9,9 @@ Android applications reverse-engineering utility <br> (pretty simple at the mome
 - APK decompiling (de-odexing, unpacking resources etc), powered by [ApkTool](https://github.com/iBotPeaches/Apktool)
 - APK re-compiling and signing (currently only test signing is supported)
 - Basic APK information (like icon, package name, package version etc), powered by [PyAxmlParser](https://github.com/appknox/pyaxmlparser)
-- Plugins support (WIP: Cocos2D plugin which is gonna be capable of packing and unpacking jsc/jsc2/luac files used by this engine)
 - User-friendly UI powered by Tkinter!
+- Plugins support, some already shipped with application: 
+    - Cocos2D plugin: capable of packing and unpacking jsc/jsc2/luac files used by Cocos2D engine
 
 ## Notes:
 This project was made by me, and my python knowledge kinda sucks <br>
