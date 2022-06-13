@@ -2,6 +2,7 @@ import os
 import tkinter as tk
 import zlib
 import xxtea
+import webbrowser
 
 from threading import Thread
 from tkinter import filedialog, messagebox
@@ -25,7 +26,7 @@ class Cocos2D:
 
         if len(self.xxtea_key.get()) != 16:
             self.logger.plugin(
-                f'[!] [{self.plugin_obj.get_plugin_name()}]' \
+                f'[ !] [{self.plugin_obj.get_plugin_name()}]' \
                 ' Key should be 16-bytes long!\n'
             )
             return
@@ -100,15 +101,23 @@ class Cocos2D:
             f'[>] [{self.plugin_obj.get_plugin_name()}] Initializing GUI\n'
         )
 
-        self.gui.create_label(self.ui_root, 20, 110, "16-byte xxtea key:" )
+        self.gui.create_link(
+            self.ui_root, 21, 90, 
+            self.plugin_obj.get_plugin_documentation_link(),
+            lambda c: webbrowser.open_new_tab(
+                self.plugin_obj.get_plugin_documentation_link()
+            )
+        )
+
+        self.gui.create_label(self.ui_root, 20, 120, "16-byte xxtea key:" )
 
         self.gui.create_editbox(
-            self.ui_root, 20, 130,
+            self.ui_root, 20, 140,
             self.xxtea_key, 173
         )
 
         self.gui.create_button(
-            self.ui_root, 20, 170, 
+            self.ui_root, 20, 180, 
             "Decrypt JSC/JSC2/LUAC", 
             self.decrypt, 172, 30
         )
