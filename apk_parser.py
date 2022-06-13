@@ -1,6 +1,6 @@
 from pyaxmlparser import APK
 import tkinter as tk
-from logger import Logger, g_logger, LogOutput, LogLevel
+from logger import g_logger
 
 # apk parser wrapper
 class ApkParser:

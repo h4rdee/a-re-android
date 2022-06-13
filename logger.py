@@ -1,3 +1,5 @@
+from utils import ECoreElements
+
 class LogLevelObject:
     priority = None
     name = None
@@ -62,6 +64,32 @@ class Logger:
 
         if install_stdout:
             self.install_output(LogOutput((lambda message, tag: print(message)), None))
+
+    def construct(self, root):
+        logbox = root.get_element_by_opt_id(ECoreElements.LOGGER)
+
+        logbox_level_colors = {
+            LogLevel.INFO.tag:     { "foreground": "#FFFFFF", "background": None    },
+            LogLevel.EXTERNAL.tag: { "foreground": "#39912D", "background": None    },
+            LogLevel.SPECIAL.tag:  { "foreground": "#AAFF00", "background": None    },
+            LogLevel.PLUGIN.tag:   { "foreground": "#00FFFF", "background": None    },
+            LogLevel.WARNING.tag:  { "foreground": "yellow" , "background": None    },
+            LogLevel.ERROR.tag:    { "foreground": "red"    , "background": "black" }
+        }
+
+        def setup_logbox(logger):
+            for color in logbox_level_colors.items(): 
+                logbox.tag_config(
+                    color[0], foreground=color[1]["foreground"],
+                    background=color[1]["background"]
+                )
+                
+        g_logger.install_output(
+            LogOutput(
+                (lambda message, tag: logbox.insert('end', message, tag)), 
+                setup_logbox
+            )
+        )
 
     def install_output(self, output):
         self.outputs.append(output)
