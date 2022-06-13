@@ -9,12 +9,12 @@ from tkinter import filedialog, messagebox
 
 # Cocos2D jsc/jsc2/luac plugin for unpacking & repacking plugin for A:RE android
 class Cocos2D:
-    def __init__(self, plugin_obj, gui, ui_root, logger) -> None:
+    def __init__(self, plugin_obj, gui) -> None:
         self.plugin_obj = plugin_obj
         self.gui = gui
-        self.ui_root = ui_root
-        self.logger = logger
-        self.xxtea_key = tk.StringVar(ui_root)
+        self.ui_root = gui.get_plugins_tab_bar()
+        self.logger = gui.get_logger()
+        self.xxtea_key = tk.StringVar(self.ui_root)
         self.valid_dec_extensions = ['jsc', 'jsc2', 'luac']
         self.valid_enc_extensions = ['js', 'lua']
         self.load()
@@ -221,5 +221,5 @@ class Cocos2D:
         )
 
 
-def __init__(plugin_obj, gui, ui_root, logger) -> None:
-    plugin = Cocos2D(plugin_obj, gui, ui_root, logger)
+def __init__(plugin_obj, gui) -> None:
+    plugin = Cocos2D(plugin_obj, gui)

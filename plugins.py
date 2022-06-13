@@ -59,11 +59,11 @@ class Plugin:
     def get_plugin_version_string(self) -> str:
         return f"{self.json_cfg['plugin_ver']['major']}.{self.json_cfg['plugin_ver']['minor']}"
 
-    def load(self, gui, ui_root, logger) -> None: # todo: return load-status from plugin
+    def load(self, gui) -> None: # todo: return load-status from plugin
         try:
             plugin_module = self.plugin_path + f"\\{self.json_cfg['plugin_entry']}"
             plugin = SourceFileLoader(os.path.basename(self.plugin_path), plugin_module).load_module()
-            plugin.__init__(self, gui, ui_root, logger)
+            plugin.__init__(self, gui)
         except Exception as ex:
             g_logger.warning(f'[!] {ex}\n')
             g_logger.error(f'[-] Failed to load {self.get_plugin_name()} plugin\n')
@@ -72,7 +72,7 @@ class PluginsManager:
     plugins_list = []
     plugins_tabs = []
 
-    def __init__(self, ui_root, tab_bar) -> None:
+    def __init__(self, ui_root) -> None:
         g_logger.info('[>] Scanning for plugins..\n')
 
         subfolders = [ f.path for f in os.scandir(str(Path.cwd()) + "\\plugins") if f.is_dir() ]
@@ -87,7 +87,7 @@ class PluginsManager:
 
                 self.plugins_list.append(plugin)
                 tab = ui_root.create_tab(
-                    tab_bar, 520, 360, plugin.get_plugin_name()
+                    ui_root.get_plugins_tab_bar(), 520, 360, plugin.get_plugin_name()
                 )
                 self.plugins_tabs.append(tab)
 
@@ -98,7 +98,7 @@ class PluginsManager:
                     f'Documentation: \n'
                 )
 
-                plugin.load(ui_root, tab_bar, g_logger)
+                plugin.load(ui_root)
             else:
                 g_logger.info(f'[-] {plugin_name} isn\'t valid plugin\n')
 
