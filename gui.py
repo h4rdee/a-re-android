@@ -1,10 +1,13 @@
 import tkinter as tk
 import tkinter.font as tkFont
+import callbacks
 
-from tkinter import Canvas, ttk
+from tkinter import ttk
 from typing import Any
 from logger import g_logger
-from enum import IntEnum
+from utils import ECoreElements
+
+from functools import partial
 
 elements_layout = {
     "button": {"width": 120, "height": 30}
@@ -26,9 +29,77 @@ class Window:
         root.geometry(align_str)
         root.resizable(width=False, height=False)
 
+        self.logger = g_logger
+        self.root = root
         self.w = width
         self.h = height
         self.log_font = tkFont.Font(family="Helvetica", size=10)
+
+    def construct(self):
+        self.tab_bar_root = self.create_tab_control(
+            self.root, 20, 20, self.w, self.h, 
+            ECoreElements.TAB_CONTROL_ROOT
+        )
+
+        self.general_tab = self.create_tab(
+            self.tab_bar_root, self.w-340, self.h-70,
+            'General', ECoreElements.GENERAL_TAB
+        )
+
+        self.plugins_tab = self.create_tab(
+            self.tab_bar_root, self.w-340, self.h-70,
+            'Plugins', ECoreElements.PLUGINS_TAB
+        )
+
+        self.tab_bar_plugins = self.create_tab_control(
+            self.plugins_tab, 20, 20, self.w, self.h, 
+            ECoreElements.TAB_CONTROL_PLUGINS
+        )
+
+        self.create_logbox(
+            self.root, 600, 20, 280, 460, ECoreElements.LOGGER
+        )
+
+        self.logger.construct(self)
+
+        self.create_button(
+            self.general_tab, 20, 20, "Decompile APK", 
+            partial(callbacks.decompile_apk_callback, self),
+            elements_layout["button"]["width"]
+        )
+
+        self.create_button(
+            self.general_tab, 20 + elements_layout["button"]["width"] * 1, 20, "Re-build APK",  
+            partial(callbacks.recompile_apk_callback, self), elements_layout["button"]["width"]
+        )
+
+        self.create_label(
+            self.general_tab, 20, 20 + 50, 'APK info:'
+        )
+
+        self.create_label(
+            self.general_tab, 20, 20 + 70, '< Load APK >',
+            ECoreElements.APK_INFO_LABEL
+        )
+
+        self.create_image(
+            self.general_tab, 20, 20 + 150, 0, 32, 32, 
+            ECoreElements.APK_ICON_VIEW
+        )
+
+        self.create_progressbar(
+            self.general_tab, -6, -7, 0, 0,
+            ECoreElements.PROGRESS_BAR
+        )
+
+    def get_root(self):
+        return self.root
+
+    def get_logger(self):
+        return self.logger
+    
+    def get_plugins_tab_bar(self) -> ttk.Notebook:
+        return self.tab_bar_plugins
 
     def get_element_by_opt_id(self, opt_id) -> Any:
         el = self.elements.get(opt_id)
