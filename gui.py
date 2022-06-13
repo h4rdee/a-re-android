@@ -3,9 +3,7 @@ import tkinter.font as tkFont
 
 from tkinter import Canvas, ttk
 from typing import Any
-
 from logger import g_logger
-
 from enum import IntEnum
 
 elements_layout = {
@@ -51,6 +49,7 @@ class Window:
 
         temp_btn = ttk.Button(root, text=label, command=callback)
         temp_btn.place(x=xpos, y=ypos, width=width, height=height)
+
         if opt_id != 0:
             self.elements[opt_id] = temp_btn
 
@@ -59,6 +58,7 @@ class Window:
     def create_label(self, root, xpos: int, ypos: int, label: str, opt_id=0) -> ttk.Label:
         temp_lbl = ttk.Label(root, text=label)
         temp_lbl.place(x=xpos, y=ypos)
+
         if opt_id != 0:
             self.elements[opt_id] = temp_lbl
 
@@ -92,6 +92,7 @@ class Window:
     def create_combobox(self, root, xpos: int, ypos: int, items, callback, opt_id=0) -> ttk.Combobox:
         temp_cbx = ttk.Combobox(root, values=items)
         temp_cbx.place(x=xpos, y=ypos, width=165)
+
         if opt_id != 0:
             self.elements[opt_id] = temp_cbx
 
@@ -141,6 +142,7 @@ class Window:
             mode='indeterminate',
             length=self.w-330
         )
+
         temp_pb.place(x=xpos, y=ypos)
         
         if opt_id != 0:
@@ -166,6 +168,20 @@ class Window:
             self.elements[opt_id] = temp_tab
 
         return temp_tab
+
+    def create_link(self, root, xpos: int, ypos: int, url: str, callback, opt_id=0) -> ttk.Label:
+        temp_lbl = ttk.Label(
+            root, text=url, cursor="hand2", 
+            foreground= "#00FFFF"
+        )
+
+        temp_lbl.bind("<Button-1>", callback)
+        temp_lbl.place(x=xpos, y=ypos)
+
+        if opt_id != 0:
+            self.elements[opt_id] = temp_lbl
+
+        return temp_lbl
 
     
     #def create_line(self, root, xpos: int, ypos: int, xposf: int, yposf: int, width: int, opt_id=0):
