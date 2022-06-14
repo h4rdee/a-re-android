@@ -1,7 +1,7 @@
-from threading import Thread
 import tkinter as tk
 
 from logger import g_logger
+from threading import Thread
 from ppadb.client import Client as AdbClient
 from ppadb.device import Device as AdbDevice
 
