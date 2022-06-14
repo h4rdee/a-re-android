@@ -72,7 +72,7 @@ class PluginsManager:
     plugins_list = []
     plugins_tabs = []
 
-    def __init__(self, ui_root) -> None:
+    def __init__(self, gui) -> None:
         g_logger.info('[>] Scanning for plugins..\n')
 
         subfolders = [ f.path for f in os.scandir(str(Path.cwd()) + "\\plugins") if f.is_dir() ]
@@ -86,19 +86,19 @@ class PluginsManager:
                 g_logger.info(f'[+] {plugin.get_plugin_name()} is valid plugin\n')
 
                 self.plugins_list.append(plugin)
-                tab = ui_root.create_tab(
-                    ui_root.get_plugins_tab_bar(), 520, 360, plugin.get_plugin_name()
+                tab = gui.create_tab(
+                    gui.get_plugins_tab_bar(), 520, 360, plugin.get_plugin_name()
                 )
                 self.plugins_tabs.append(tab)
 
-                ui_root.create_label(
+                gui.create_label(
                     self.plugins_tabs[-1], 20, 20, 
                     f'{plugin.get_plugin_name()} v{plugin.get_plugin_version_string()} ' +
                     f'by {plugin.get_plugin_author()}\n{plugin.get_plugin_description()}\n' +
                     f'Documentation: \n'
                 )
 
-                plugin.load(ui_root)
+                plugin.load(gui)
             else:
                 g_logger.info(f'[-] {plugin_name} isn\'t valid plugin\n')
 
