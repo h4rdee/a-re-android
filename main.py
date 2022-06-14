@@ -2,9 +2,12 @@
 # - layout scheme for elements
 
 from gui import Window, tk, ttk
-from plugins import PluginsManager
+from apk_manager import ApkManager
+from plugins_manager import PluginsManager
 from tkinter import Canvas
 from pathlib import Path
+
+from adb_manager import AdbManager
 
 # global vars holding tk, window, style and canvas instances
 g_root = tk.Tk()
@@ -36,15 +39,13 @@ def init() -> None:
         "https://github.com/h4rdee/a-re-android\n\n"
     )
 
+    apk_manager = ApkManager(g_app)
+    adb_manager = AdbManager(g_app)
     plugins_manager = PluginsManager(g_app)
 
     g_canvas.pack()
     g_logger.info("[+] UI initialized\n")
     g_root.mainloop()
 
-
-def main() -> None:
-    init()
-
 if __name__ == '__main__':
-    main()
+    init()

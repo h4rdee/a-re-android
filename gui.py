@@ -1,6 +1,5 @@
 import tkinter as tk
 import tkinter.font as tkFont
-import callbacks
 
 from tkinter import ttk
 from typing import Any
@@ -14,8 +13,7 @@ elements_layout = {
 }
 
 class Window:
-    log_font = None
-    elements = { None: None }
+    __elements = { None: None }
 
     def __init__(self, root, w, h, title):
         root.title(title)
@@ -29,89 +27,79 @@ class Window:
         root.geometry(align_str)
         root.resizable(width=False, height=False)
 
-        self.logger = g_logger
-        self.root = root
-        self.w = width
-        self.h = height
-        self.log_font = tkFont.Font(family="Helvetica", size=10)
+        self.__logger = g_logger
+        self.__root = root
+        self.__w = width
+        self.__h = height
+        self.__log_font = tkFont.Font(family="Helvetica", size=10)
+        self.__terminal_font = tkFont.Font(family="Helvetica", size=9)
 
     def construct(self):
-        self.tab_bar_root = self.create_tab_control(
-            self.root, 20, 20, self.w, self.h, 
+        self.__tab_bar_root = self.create_tab_control(
+            self.__root, 20, 20, self.__w, self.__h, 
             ECoreElements.TAB_CONTROL_ROOT
         )
 
-        self.general_tab = self.create_tab(
-            self.tab_bar_root, self.w-340, self.h-70,
+        self.__general_tab = self.create_tab(
+            self.__tab_bar_root, self.__w-340, self.__h-70,
             'General', ECoreElements.GENERAL_TAB
         )
 
-        self.plugins_tab = self.create_tab(
-            self.tab_bar_root, self.w-340, self.h-70,
+        self.__adb_tab = self.create_tab(
+            self.__tab_bar_root, self.__w-340, self.__h-70,
+            'ADB', ECoreElements.ADB_TAB
+        )
+
+        self.__tab_bar_adb = self.create_tab_control(
+            self.__adb_tab, 20, 20, self.__w, self.__h,
+            ECoreElements.TAB_CONTROL_ADB
+        )
+
+        self.__plugins_tab = self.create_tab(
+            self.__tab_bar_root, self.__w-340, self.__h-70,
             'Plugins', ECoreElements.PLUGINS_TAB
         )
 
-        self.tab_bar_plugins = self.create_tab_control(
-            self.plugins_tab, 20, 20, self.w, self.h, 
+        self.__tab_bar_plugins = self.create_tab_control(
+            self.__plugins_tab, 20, 20, self.__w, self.__h, 
             ECoreElements.TAB_CONTROL_PLUGINS
         )
 
         self.create_logbox(
-            self.root, 600, 20, 280, 460, ECoreElements.LOGGER
+            self.__root, 600, 20, 280, 460, ECoreElements.LOGGER
         )
 
-        self.logger.construct(self)
-
-        self.create_button(
-            self.general_tab, 20, 20, "Decompile APK", 
-            partial(callbacks.decompile_apk_callback, self),
-            elements_layout["button"]["width"]
-        )
-
-        self.create_button(
-            self.general_tab, 20 + elements_layout["button"]["width"] * 1, 20, "Re-build APK",  
-            partial(callbacks.recompile_apk_callback, self), elements_layout["button"]["width"]
-        )
-
-        self.create_label(
-            self.general_tab, 20, 20 + 50, 'APK info:'
-        )
-
-        self.create_label(
-            self.general_tab, 20, 20 + 70, '< Load APK >',
-            ECoreElements.APK_INFO_LABEL
-        )
-
-        self.create_image(
-            self.general_tab, 20, 20 + 150, 0, 32, 32, 
-            ECoreElements.APK_ICON_VIEW
-        )
-
-        self.create_progressbar(
-            self.general_tab, -6, -7, 0, 0,
-            ECoreElements.PROGRESS_BAR
-        )
+        self.__logger.construct(self)
 
     def get_root(self):
-        return self.root
+        return self.__root
 
     def get_logger(self):
-        return self.logger
+        return self.__logger
+
+    def get_general_tab(self) -> ttk.Notebook:
+        return self.__general_tab
+
+    def get_adb_tab(self) -> ttk.Notebook:
+        return self.__adb_tab
     
     def get_plugins_tab_bar(self) -> ttk.Notebook:
-        return self.tab_bar_plugins
+        return self.__tab_bar_plugins
+
+    def get_adb_tab_bar(self) -> ttk.Notebook:
+        return self.__tab_bar_adb
 
     def get_element_by_opt_id(self, opt_id) -> Any:
-        el = self.elements.get(opt_id)
+        el = self.__elements.get(opt_id)
         if el is None:
-            g_logger.error(f"[ !] element with opt_id {opt_id} not found\n")
+            self.__logger.error(f"[ !] element with opt_id {opt_id} not found\n")
         return el
 
     def push_external_element(self, element, id: int) -> None:
         if id != 0:
-            self.elements[id] = element
+            self.__elements[id] = element
         else:
-            g_logger.warning(
+            self.__logger.warning(
                 "[ !] skipping element: external elements must have an id\n"
             )
 
@@ -122,7 +110,7 @@ class Window:
         temp_btn.place(x=xpos, y=ypos, width=width, height=height)
 
         if opt_id != 0:
-            self.elements[opt_id] = temp_btn
+            self.__elements[opt_id] = temp_btn
 
         return temp_btn
 
@@ -131,7 +119,7 @@ class Window:
         temp_lbl.place(x=xpos, y=ypos)
 
         if opt_id != 0:
-            self.elements[opt_id] = temp_lbl
+            self.__elements[opt_id] = temp_lbl
 
         return temp_lbl
 
@@ -139,11 +127,10 @@ class Window:
         width=70, height=30, opt_id=0) -> ttk.Entry:
 
         temp_ebx = ttk.Entry(root, textvariable=var)
-        temp_ebx.insert(0, var.get())
         temp_ebx.place(x=xpos, y=ypos, width=width, height=height)
 
         if opt_id != 0:
-            self.elements[opt_id] = temp_ebx
+            self.__elements[opt_id] = temp_ebx
 
         return temp_ebx
 
@@ -156,16 +143,17 @@ class Window:
         )
         temp_sld.place(x=xpos, y=ypos, height=150)
         if opt_id != 0:
-            self.elements[opt_id] = temp_sld
+            self.__elements[opt_id] = temp_sld
 
         return temp_sld
 
     def create_combobox(self, root, xpos: int, ypos: int, items, callback, opt_id=0) -> ttk.Combobox:
         temp_cbx = ttk.Combobox(root, values=items)
+        temp_cbx.bind("<<ComboboxSelected>>", callback)
         temp_cbx.place(x=xpos, y=ypos, width=165)
 
         if opt_id != 0:
-            self.elements[opt_id] = temp_cbx
+            self.__elements[opt_id] = temp_cbx
 
         return temp_cbx
 
@@ -173,15 +161,15 @@ class Window:
         temp_tbx = tk.Text(root, width=w, height=h)
 
         scroll_y = ttk.Scrollbar(temp_tbx)
-        scroll_y.pack(side = tk.RIGHT, fill = 'both')#tk.Y)
-        scroll_x = ttk.Scrollbar(temp_tbx, orient = tk.HORIZONTAL)
-        scroll_x.pack(side = tk.BOTTOM, fill = 'both')#tk.X)
+        scroll_y.pack(side=tk.RIGHT, fill='both')
+        scroll_x = ttk.Scrollbar(temp_tbx, orient=tk.HORIZONTAL)
+        scroll_x.pack(side=tk.BOTTOM, fill='both')
 
-        scroll_y.config(command = temp_tbx.yview)
-        scroll_x.config(command = temp_tbx.xview)
+        scroll_y.config(command=temp_tbx.yview)
+        scroll_x.config(command=temp_tbx.xview)
 
         temp_tbx.configure(
-            font=self.log_font, wrap=tk.NONE, 
+            font=self.__log_font, wrap=tk.NONE, 
             yscrollcommand = scroll_y.set,
             xscrollcommand = scroll_x.set
         )
@@ -189,7 +177,7 @@ class Window:
         temp_tbx.place(x=xpos, y=ypos, width=w, height=h)
 
         if opt_id != 0:
-            self.elements[opt_id] = temp_tbx
+            self.__elements[opt_id] = temp_tbx
 
         return temp_tbx
 
@@ -203,7 +191,7 @@ class Window:
         temp_lbl.place(x=xpos, y=ypos)
 
         if opt_id != 0:
-            self.elements[opt_id] = temp_lbl
+            self.__elements[opt_id] = temp_lbl
 
         return temp_lbl
 
@@ -211,13 +199,13 @@ class Window:
         temp_pb = ttk.Progressbar(
             root, orient='horizontal',
             mode='indeterminate',
-            length=self.w-330
+            length=self.__w-330
         )
 
         temp_pb.place(x=xpos, y=ypos)
         
         if opt_id != 0:
-            self.elements[opt_id] = temp_pb
+            self.__elements[opt_id] = temp_pb
 
         return temp_pb
 
@@ -226,7 +214,7 @@ class Window:
         temp_tabbar.place(x=xpos, y=ypos)
 
         if opt_id != 0:
-            self.elements[opt_id] = temp_tabbar
+            self.__elements[opt_id] = temp_tabbar
 
         return temp_tabbar
 
@@ -236,7 +224,7 @@ class Window:
         # root.pack(expand=1, fill="both")
 
         if opt_id != 0:
-            self.elements[opt_id] = temp_tab
+            self.__elements[opt_id] = temp_tab
 
         return temp_tab
 
@@ -250,9 +238,25 @@ class Window:
         temp_lbl.place(x=xpos, y=ypos)
 
         if opt_id != 0:
-            self.elements[opt_id] = temp_lbl
+            self.__elements[opt_id] = temp_lbl
 
         return temp_lbl
+
+    def create_terminal(self, root, xpos: int, ypos: int, w: int, h: int, callback, opt_id=0) -> tk.Text:
+        temp_tbx = tk.Text(root, width=w, height=h)
+
+        temp_tbx.configure(
+            font=self.__terminal_font, wrap=tk.NONE, 
+            foreground="#a6e22e", background="black"
+        )
+
+        temp_tbx.bind('<Return>', callback)
+        temp_tbx.place(x=xpos, y=ypos, width=w, height=h)
+
+        if opt_id != 0:
+            self.__elements[opt_id] = temp_tbx
+
+        return temp_tbx
 
     
     #def create_line(self, root, xpos: int, ypos: int, xposf: int, yposf: int, width: int, opt_id=0):
