@@ -173,4 +173,15 @@ def selected_device_changed_callback(adb_manager: AdbManager, threaded=False) ->
         )
         thread.start()
         return
+
+    gui = adb_manager.get_gui()
+    logger = gui.get_logger()
+
+    devices_cbx = gui.get_element_by_opt_id(
+        ECoreElements.ADB_DEVICES
+    )
+
+    selected_device = devices_cbx.get()
+    adb_manager.set_selected_device(selected_device)
+    logger.info(f'[>] [adb] Changed device to {selected_device}\n')
     

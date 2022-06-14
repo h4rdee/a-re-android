@@ -4,18 +4,20 @@ import callbacks
 from logger import g_logger
 from functools import partial
 from ppadb.client import Client as AdbClient
+from ppadb.device import Device as AdbDevice
 
 from utils import ECoreElements
 
 class AdbManager:
     def __init__(self, gui) -> None:
         self.client = None
+        self.selected_device = None
         self.gui = gui
         self.ui_root = gui.get_adb_tab()
         self.logger = g_logger
         self.is_connected = False
         self.construct()
-
+        
     def get_gui(self):
         return self.gui
 
@@ -57,7 +59,7 @@ class AdbManager:
 
         self.devices_cbx = self.gui.create_combobox(
             self.ui_root, 20, 140, [],
-            callbacks.selected_device_changed_callback,
+            partial(callbacks.selected_device_changed_callback, self),
             ECoreElements.ADB_DEVICES
         )
 
@@ -90,3 +92,12 @@ class AdbManager:
             result.append(device.serial)
     
         return result
+
+    def get_device_by_serial(self, serial) -> AdbDevice:
+        for device in self.client.devices():
+            if serial == device.serial:
+                return device
+        return None
+
+    def set_selected_device(self, serial) -> None:
+        self.selected_device = serial
