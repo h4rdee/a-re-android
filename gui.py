@@ -247,18 +247,8 @@ class Window:
     def create_terminal(self, root, xpos: int, ypos: int, w: int, h: int, callback, opt_id=0) -> tk.Text:
         temp_tbx = tk.Text(root, width=w, height=h)
 
-        #scroll_y = ttk.Scrollbar(temp_tbx)
-        #scroll_y.pack(side = tk.RIGHT, fill = 'both') #tk.Y)
-        #scroll_x = ttk.Scrollbar(temp_tbx, orient = tk.HORIZONTAL)
-        #scroll_x.pack(side = tk.BOTTOM, fill = 'both') #tk.X)
-
-        #scroll_y.config(command=temp_tbx.yview)
-        #scroll_x.config(command=temp_tbx.xview)
-
         temp_tbx.configure(
             font=self.terminal_font, wrap=tk.NONE, 
-            #yscrollcommand = scroll_y.set,
-            #xscrollcommand = scroll_x.set,
             foreground="#a6e22e", background="black"
         )
 
