@@ -6,8 +6,6 @@ from typing import Any
 from logger import g_logger
 from utils import ECoreElements
 
-from functools import partial
-
 elements_layout = {
     "button": {"width": 120, "height": 30}
 }
