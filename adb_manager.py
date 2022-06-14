@@ -125,6 +125,16 @@ class AdbManager:
     def set_selected_device(self, serial) -> None:
         self.__selected_device = serial
 
+    def __on_device_lost(self) -> None:
+        self.__logger.error('[ !] [adb] Lost device!\n')
+        self.__devices_label.config(text='< no devices >')
+        self.__devices_cbx.set('')
+        self.__devices_cbx["values"] = []
+        self.__devices_cbx["state"] = "disabled"
+        self.__shell_label.config(text='Device shell (connect to adb server and select device first):')
+        self.__shell_terminal["state"] = "disabled"
+        self.set_selected_device(None)
+
     def __shell_result_handler(self, connection) -> None:
         while True:
             data = connection.read(1024)
@@ -147,10 +157,14 @@ class AdbManager:
         terminal_content = self.__shell_terminal.get("1.0", "end-1c")
         self.__shell_command = terminal_content.split('\n')[-2].strip()
 
-        self.__logger.info(f'[>] [adb] Executing "{self.__shell_command}" on {self.__selected_device}')
+        self.__logger.info(f'[>] [adb] Executing "{self.__shell_command}" on {self.__selected_device}\n')
 
         device = self.__client.device(self.__selected_device)
-        device.shell(self.__shell_command, handler=self.__shell_result_handler)
+
+        if device != None:
+            device.shell(self.__shell_command, handler=self.__shell_result_handler)
+        else:
+            self.__on_device_lost()
         
     def __adb_connect_callback(self, __none__=None, threaded=False) -> None:
         if threaded == False: # hack, i'm too lazy to asyncify tkinter
