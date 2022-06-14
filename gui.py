@@ -148,7 +148,7 @@ class Window:
     def create_combobox(self, root, xpos: int, ypos: int, items, callback, opt_id=0) -> ttk.Combobox:
         temp_cbx = ttk.Combobox(root, values=items)
         temp_cbx.bind("<<ComboboxSelected>>", callback)
-        temp_cbx.place(x=xpos, y=ypos, width=165)
+        temp_cbx.place(x=xpos, y=ypos, width=160)
 
         if opt_id != 0:
             self.__elements[opt_id] = temp_cbx
