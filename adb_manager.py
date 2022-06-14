@@ -2,7 +2,6 @@ from threading import Thread
 import tkinter as tk
 
 from logger import g_logger
-from functools import partial
 from ppadb.client import Client as AdbClient
 from ppadb.device import Device as AdbDevice
 
@@ -10,168 +9,162 @@ from utils import ECoreElements
 
 class AdbManager:
     def __init__(self, gui) -> None:
-        self.client = None
-        self.selected_device = None
-        self.gui = gui
-        self.ui_root = gui.get_adb_tab()
-        self.logger = g_logger
-        self.shell_command = tk.StringVar(self.ui_root, '> ')
-        self.is_connected = False
-        self.construct()
-        
-    def get_gui(self):
-        return self.gui
+        self.__client = None
+        self.__is_connected = False
+        self.__selected_device = None
+        self.__ui_root = gui.get_adb_tab()
+        self.__shell_command = tk.StringVar(self.__ui_root, '> ')
+        self.__gui = gui
+        self.__logger = g_logger
+        self.__construct()
 
-    def construct(self) -> None:
-        self.settings_tab = self.gui.create_tab(
-            self.gui.get_adb_tab_bar(), 520, 360, 'Settings'
+    def __construct(self) -> None:
+        self.__settings_tab = self.__gui.create_tab(
+            self.__gui.get_adb_tab_bar(), 520, 360, 'Settings'
         )
 
-        self.shell_tab = self.gui.create_tab(
-            self.gui.get_adb_tab_bar(), 520, 360, 'Shell'
+        self.__shell_tab = self.__gui.create_tab(
+            self.__gui.get_adb_tab_bar(), 520, 360, 'Shell'
         )
 
-        self.gui.create_label(
-            self.settings_tab, 20, 20, 'IP:'
+        self.__gui.create_label(
+            self.__settings_tab, 20, 20, 'IP:'
         )
 
-        self.adb_server_ip = tk.StringVar(self.settings_tab)
-        self.adb_server_port = tk.StringVar(self.settings_tab)
+        self.__adb_server_ip = tk.StringVar(self.__settings_tab)
+        self.__adb_server_port = tk.StringVar(self.__settings_tab)
 
-        self.adb_server_ip.set('127.0.0.1')
-        self.adb_server_port.set('5037')
+        self.__adb_server_ip.set('127.0.0.1')
+        self.__adb_server_port.set('5037')
 
-        self.gui.create_editbox(
-            self.settings_tab, 20, 40, 
-            self.adb_server_ip, 100
+        self.__gui.create_editbox(
+            self.__settings_tab, 20, 40, 
+            self.__adb_server_ip, 100
         )
 
-        self.gui.create_label(
-            self.settings_tab, 130, 20, 'Port:'
+        self.__gui.create_label(
+            self.__settings_tab, 130, 20, 'Port:'
         )
 
-        self.gui.create_editbox(
-            self.settings_tab, 130, 40, 
-            self.adb_server_port, 50
+        self.__gui.create_editbox(
+            self.__settings_tab, 130, 40, 
+            self.__adb_server_port, 50
         )
 
-        self.gui.create_button(
-            self.settings_tab, 20, 80, 'Connect to ADB server',
-            partial(self.adb_connect_callback, self), 160
+        self.__gui.create_button(
+            self.__settings_tab, 20, 80, 'Connect to ADB server',
+            self.__adb_connect_callback, 160
         )
 
-        self.devices_label = self.gui.create_label(
-            self.settings_tab, 20, 120, 
+        self.__devices_label = self.__gui.create_label(
+            self.__settings_tab, 20, 120, 
             'Devices list: (connect to adb server first)',
             ECoreElements.ADB_DEVICES_LABEL
         )
 
-        self.devices_cbx = self.gui.create_combobox(
-            self.settings_tab, 20, 140, [],
-            partial(self.selected_device_changed_callback, self),
+        self.__devices_cbx = self.__gui.create_combobox(
+            self.__settings_tab, 20, 140, [],
+            self.__selected_device_changed_callback,
             ECoreElements.ADB_DEVICES
         )
 
-        self.devices_cbx.focus_set()
+        self.__devices_cbx.focus_set()
 
-        self.shell_label = self.gui.create_label(
-            self.shell_tab, 20, 20, 
+        self.__shell_label = self.__gui.create_label(
+            self.__shell_tab, 20, 20, 
             'Device shell (connect to adb server and select device first):',
             ECoreElements.ADB_SHELL_LABEL
         )
 
-        self.shell_terminal = self.gui.create_terminal(
-            self.shell_tab, 20, 40, 480, 300, 
-            self.shell_command_callback,
+        self.__shell_terminal = self.__gui.create_terminal(
+            self.__shell_tab, 20, 40, 480, 300, 
+            self.__shell_command_callback,
             ECoreElements.ADB_SHELL_TERMINAL
         )
 
         # self.shell_terminal.insert('end', '> ')
-        self.shell_terminal.focus_set()
+        self.__shell_terminal.focus_set()
 
-        self.shell_terminal["state"] = "disabled"
-        self.devices_cbx["state"] = "disabled"
+        self.__shell_terminal["state"] = "disabled"
+        self.__devices_cbx["state"] = "disabled"
 
     def connect(self, host="127.0.0.1", port=5037):
         try:
-            self.client = AdbClient(host=host, port=port)
-            self.is_connected = True
-            self.logger.info(f'[+] [adb] Connected! Client version: {self.client.version()}\n')
+            self.__client = AdbClient(host=host, port=port)
+            self.__is_connected = True
+            self.__logger.info(f'[+] [adb] Connected! Client version: {self.__client.version()}\n')
         except Exception as ex:
-            self.logger.error(f'[ !] [adb] {ex}\n')
+            self.__logger.error(f'[ !] [adb] {ex}\n')
 
     def is_connected(self) -> bool:
         return self.is_connected
 
     def get_adb_server_ip(self) -> str:
-        return self.adb_server_ip.get()
+        return self.__adb_server_ip.get()
 
     def get_adb_server_port(self) -> str:
-        return str(self.adb_server_port.get())
+        return str(self.__adb_server_port.get())
 
     def get_devices_list(self) -> list:
-        if self.client == None:
-            self.logger.error(f'[ !] ADB client is not connected')
+        if self.__client == None:
+            self.__logger.error(f'[ !] ADB client is not connected')
             return []
 
         result = []
-        for device in self.client.devices():
+        for device in self.__client.devices():
             result.append(device.serial)
     
         return result
 
     def get_device_by_serial(self, serial) -> AdbDevice:
-        for device in self.client.devices():
+        for device in self.__client.devices():
             if serial == device.serial:
                 return device
         return None
 
     def set_selected_device(self, serial) -> None:
-        self.selected_device = serial
+        self.__selected_device = serial
 
-    def shell_result_handler(self, connection) -> None:
+    def __shell_result_handler(self, connection) -> None:
         while True:
             data = connection.read(1024)
             if not data:
                 break
-            self.shell_terminal.insert('end', f'> {data.decode("utf-8")}\n')
-            self.shell_terminal.yview_pickplace("end")
+            self.__shell_terminal.insert('end', f'> {data.decode("utf-8")}\n')
+            self.__shell_terminal.yview_pickplace("end")
 
         connection.close()
 
-    def shell_command_callback(self, __none__=None, threaded=False) -> None:
+    def __shell_command_callback(self, __none__=None, threaded=False) -> None:
         if threaded == False: # hack, i'm too lazy to asyncify tkinter
             thread = Thread(
-                target=self.shell_command_callback, 
+                target=self.__shell_command_callback, 
                 args=(self, True,)
             )
             thread.start()
             return
 
-        terminal_content = self.shell_terminal.get("1.0", "end-1c")
-        self.shell_command = terminal_content.split('\n')[-2].strip()
+        terminal_content = self.__shell_terminal.get("1.0", "end-1c")
+        self.__shell_command = terminal_content.split('\n')[-2].strip()
 
-        self.logger.info(f'[>] [adb] Executing "{self.shell_command}" on {self.selected_device}')
+        self.__logger.info(f'[>] [adb] Executing "{self.__shell_command}" on {self.__selected_device}')
 
-        device = self.client.device(self.selected_device)
-        device.shell(self.shell_command, handler=self.shell_result_handler)
+        device = self.__client.device(self.__selected_device)
+        device.shell(self.__shell_command, handler=self.__shell_result_handler)
         
-    def adb_connect_callback(self, __none__=None, threaded=False) -> None:
+    def __adb_connect_callback(self, __none__=None, threaded=False) -> None:
         if threaded == False: # hack, i'm too lazy to asyncify tkinter
             thread = Thread(
-                target=self.adb_connect_callback, 
+                target=self.__adb_connect_callback, 
                 args=(self, True,)
             )
             thread.start()
             return
 
-        gui = self.get_gui()
-        logger = gui.get_logger()
+        server_ip = self.__adb_server_ip.get()
+        server_port = self.__adb_server_port.get()
 
-        server_ip = self.get_adb_server_ip()
-        server_port = self.get_adb_server_port()
-
-        logger.info(
+        self.__logger.info(
             f'[>] [adb] Connecting to {server_ip}:{server_port}..\n'
         )
 
@@ -179,36 +172,32 @@ class AdbManager:
         devices = self.get_devices_list()
 
         if len(devices) == 0:
-            self.devices_label.config(text='< no devices >')
+            self.__devices_label.config(text='< no devices >')
             self.set_selected_device(None)
             return
 
-        self.devices_label.config(text='Devices list:')
+        self.__devices_label.config(text='Devices list:')
 
-        self.devices_cbx["state"] = "readonly"
-        self.shell_terminal["state"] = "normal"
-        self.devices_cbx["values"] = devices
-        self.devices_cbx.current(0)
+        self.__devices_cbx["state"] = "readonly"
+        self.__shell_terminal["state"] = "normal"
+        self.__devices_cbx["values"] = devices
+        self.__devices_cbx.current(0)
 
-        self.set_selected_device(self.devices_cbx.get())
+        self.set_selected_device(self.__devices_cbx.get())
 
-        self.shell_label.config(text=f'Shell ({self.devices_cbx.get()}):')
+        self.__shell_label.config(text=f'Shell ({self.__devices_cbx.get()}):')
 
-    def selected_device_changed_callback(self, __none__=None, threaded=False) -> None:
+    def __selected_device_changed_callback(self, __none__=None, threaded=False) -> None:
         if threaded == False: # hack, i'm too lazy to asyncify tkinter
             thread = Thread(
-                target=self.selected_device_changed_callback, 
+                target=self.__selected_device_changed_callback, 
                 args=(self, True,)
             )
             thread.start()
             return
 
-        gui = self.get_gui()
-        logger = gui.get_logger()
-
-        selected_device = self.devices_cbx.get()
+        selected_device = self.__devices_cbx.get()
         self.set_selected_device(selected_device)
 
-        self.shell_label.config(text=f'Shell ({selected_device}):')
-
-        logger.info(f'[>] [adb] Changed device to {selected_device}\n')
+        self.__shell_label.config(text=f'Shell ({selected_device}):')
+        self.__logger.info(f'[>] [adb] Changed device to {selected_device}\n')
