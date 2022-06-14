@@ -10,4 +10,7 @@ class ECoreElements(IntEnum):
     TAB_CONTROL_ROOT = 5,
     TAB_CONTROL_PLUGINS = 6,
     GENERAL_TAB = 7,
-    PLUGINS_TAB = 8,
+    ADB_TAB = 8,
+    PLUGINS_TAB = 9,
+    ADB_DEVICES_LABEL = 10,
+    ADB_DEVICES = 11
