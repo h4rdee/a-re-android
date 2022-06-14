@@ -97,7 +97,7 @@ class AdbManager:
             self.__logger.error(f'[ !] [adb] {ex}\n')
 
     def is_connected(self) -> bool:
-        return self.is_connected
+        return self.__is_connected
 
     def get_adb_server_ip(self) -> str:
         return self.__adb_server_ip.get()
