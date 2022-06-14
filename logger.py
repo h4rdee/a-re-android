@@ -65,8 +65,8 @@ class Logger:
         if install_stdout:
             self.install_output(LogOutput((lambda message, tag: print(message)), None))
 
-    def construct(self, root):
-        logbox = root.get_element_by_opt_id(ECoreElements.LOGGER)
+    def construct(self, ui_root):
+        logbox = ui_root.get_element_by_opt_id(ECoreElements.LOGGER)
 
         logbox_level_colors = {
             LogLevel.INFO.tag:     { "foreground": "#FFFFFF", "background": None    },
