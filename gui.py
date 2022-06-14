@@ -46,6 +46,11 @@ class Window:
             'General', ECoreElements.GENERAL_TAB
         )
 
+        self.adb_tab = self.create_tab(
+            self.tab_bar_root, self.w-340, self.h-70,
+            'ADB', ECoreElements.ADB_TAB
+        )
+
         self.plugins_tab = self.create_tab(
             self.tab_bar_root, self.w-340, self.h-70,
             'Plugins', ECoreElements.PLUGINS_TAB
@@ -62,41 +67,17 @@ class Window:
 
         self.logger.construct(self)
 
-        self.create_button(
-            self.general_tab, 20, 20, "Decompile APK", 
-            partial(callbacks.decompile_apk_callback, self),
-            elements_layout["button"]["width"]
-        )
-
-        self.create_button(
-            self.general_tab, 20 + elements_layout["button"]["width"] * 1, 20, "Re-build APK",  
-            partial(callbacks.recompile_apk_callback, self), elements_layout["button"]["width"]
-        )
-
-        self.create_label(
-            self.general_tab, 20, 20 + 50, 'APK info:'
-        )
-
-        self.create_label(
-            self.general_tab, 20, 20 + 70, '< Load APK >',
-            ECoreElements.APK_INFO_LABEL
-        )
-
-        self.create_image(
-            self.general_tab, 20, 20 + 150, 0, 32, 32, 
-            ECoreElements.APK_ICON_VIEW
-        )
-
-        self.create_progressbar(
-            self.general_tab, -6, -7, 0, 0,
-            ECoreElements.PROGRESS_BAR
-        )
-
     def get_root(self):
         return self.root
 
     def get_logger(self):
         return self.logger
+
+    def get_general_tab(self) -> ttk.Notebook:
+        return self.general_tab
+
+    def get_adb_tab(self) -> ttk.Notebook:
+        return self.adb_tab
     
     def get_plugins_tab_bar(self) -> ttk.Notebook:
         return self.tab_bar_plugins
@@ -139,7 +120,7 @@ class Window:
         width=70, height=30, opt_id=0) -> ttk.Entry:
 
         temp_ebx = ttk.Entry(root, textvariable=var)
-        temp_ebx.insert(0, var.get())
+        # temp_ebx.insert(0, var.get())
         temp_ebx.place(x=xpos, y=ypos, width=width, height=height)
 
         if opt_id != 0:
@@ -162,6 +143,7 @@ class Window:
 
     def create_combobox(self, root, xpos: int, ypos: int, items, callback, opt_id=0) -> ttk.Combobox:
         temp_cbx = ttk.Combobox(root, values=items)
+        temp_cbx.bind("<<ComboboxSelected>>", callback)
         temp_cbx.place(x=xpos, y=ypos, width=165)
 
         if opt_id != 0:
