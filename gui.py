@@ -1,6 +1,5 @@
 import tkinter as tk
 import tkinter.font as tkFont
-import callbacks
 
 from tkinter import ttk
 from typing import Any
@@ -34,6 +33,7 @@ class Window:
         self.w = width
         self.h = height
         self.log_font = tkFont.Font(family="Helvetica", size=10)
+        self.terminal_font = tkFont.Font(family="Helvetica", size=9)
 
     def construct(self):
         self.tab_bar_root = self.create_tab_control(
@@ -49,6 +49,11 @@ class Window:
         self.adb_tab = self.create_tab(
             self.tab_bar_root, self.w-340, self.h-70,
             'ADB', ECoreElements.ADB_TAB
+        )
+
+        self.tab_bar_adb = self.create_tab_control(
+            self.adb_tab, 20, 20, self.w, self.h,
+            ECoreElements.TAB_CONTROL_ADB
         )
 
         self.plugins_tab = self.create_tab(
@@ -81,6 +86,9 @@ class Window:
     
     def get_plugins_tab_bar(self) -> ttk.Notebook:
         return self.tab_bar_plugins
+
+    def get_adb_tab_bar(self) -> ttk.Notebook:
+        return self.tab_bar_adb
 
     def get_element_by_opt_id(self, opt_id) -> Any:
         el = self.elements.get(opt_id)
@@ -235,6 +243,32 @@ class Window:
             self.elements[opt_id] = temp_lbl
 
         return temp_lbl
+
+    def create_terminal(self, root, xpos: int, ypos: int, w: int, h: int, callback, opt_id=0) -> tk.Text:
+        temp_tbx = tk.Text(root, width=w, height=h)
+
+        #scroll_y = ttk.Scrollbar(temp_tbx)
+        #scroll_y.pack(side = tk.RIGHT, fill = 'both') #tk.Y)
+        #scroll_x = ttk.Scrollbar(temp_tbx, orient = tk.HORIZONTAL)
+        #scroll_x.pack(side = tk.BOTTOM, fill = 'both') #tk.X)
+
+        #scroll_y.config(command=temp_tbx.yview)
+        #scroll_x.config(command=temp_tbx.xview)
+
+        temp_tbx.configure(
+            font=self.terminal_font, wrap=tk.NONE, 
+            #yscrollcommand = scroll_y.set,
+            #xscrollcommand = scroll_x.set,
+            foreground="#a6e22e", background="black"
+        )
+
+        temp_tbx.bind('<Return>', callback)
+        temp_tbx.place(x=xpos, y=ypos, width=w, height=h)
+
+        if opt_id != 0:
+            self.elements[opt_id] = temp_tbx
+
+        return temp_tbx
 
     
     #def create_line(self, root, xpos: int, ypos: int, xposf: int, yposf: int, width: int, opt_id=0):

@@ -82,12 +82,14 @@ class AdbManager:
 
         self.shell_terminal = self.gui.create_terminal(
             self.shell_tab, 20, 40, 480, 300, 
+            self.shell_command_callback,
             ECoreElements.ADB_SHELL_TERMINAL
         )
 
-        self.shell_terminal.insert('end', '> ')
+        # self.shell_terminal.insert('end', '> ')
         self.shell_terminal.focus_set()
 
+        self.shell_terminal["state"] = "disabled"
         self.devices_cbx["state"] = "disabled"
 
     def connect(self, host="127.0.0.1", port=5037):
@@ -127,6 +129,33 @@ class AdbManager:
     def set_selected_device(self, serial) -> None:
         self.selected_device = serial
 
+    def shell_result_handler(self, connection) -> None:
+        while True:
+            data = connection.read(1024)
+            if not data:
+                break
+            self.shell_terminal.insert('end', f'> {data.decode("utf-8")}\n')
+            self.shell_terminal.yview_pickplace("end")
+
+        connection.close()
+
+    def shell_command_callback(self, __none__=None, threaded=False) -> None:
+        if threaded == False: # hack, i'm too lazy to asyncify tkinter
+            thread = Thread(
+                target=self.shell_command_callback, 
+                args=(self, True,)
+            )
+            thread.start()
+            return
+
+        terminal_content = self.shell_terminal.get("1.0", "end-1c")
+        self.shell_command = terminal_content.split('\n')[-2].strip()
+
+        self.logger.info(f'[>] [adb] Executing "{self.shell_command}" on {self.selected_device}')
+
+        device = self.client.device(self.selected_device)
+        device.shell(self.shell_command, handler=self.shell_result_handler)
+        
     def adb_connect_callback(self, __none__=None, threaded=False) -> None:
         if threaded == False: # hack, i'm too lazy to asyncify tkinter
             thread = Thread(
@@ -147,35 +176,23 @@ class AdbManager:
         )
 
         self.connect(server_ip, int(server_port))
-
-        devices_label = gui.get_element_by_opt_id(
-            ECoreElements.ADB_DEVICES_LABEL
-        )
-
-        shell_label = gui.get_element_by_opt_id(
-            ECoreElements.ADB_SHELL_LABEL
-        )
-
-        devices_cbx = gui.get_element_by_opt_id(
-            ECoreElements.ADB_DEVICES
-        )
-
         devices = self.get_devices_list()
 
         if len(devices) == 0:
-            devices_label.config(text='< no devices >')
+            self.devices_label.config(text='< no devices >')
             self.set_selected_device(None)
             return
 
-        devices_label.config(text='Devices list:')
+        self.devices_label.config(text='Devices list:')
 
-        devices_cbx["state"] = "readonly"
-        devices_cbx["values"] = devices
-        devices_cbx.current(0)
+        self.devices_cbx["state"] = "readonly"
+        self.shell_terminal["state"] = "normal"
+        self.devices_cbx["values"] = devices
+        self.devices_cbx.current(0)
 
-        self.set_selected_device(devices_cbx.get())
+        self.set_selected_device(self.devices_cbx.get())
 
-        shell_label.config(text=f'Shell ({devices_cbx.get()}):')
+        self.shell_label.config(text=f'Shell ({self.devices_cbx.get()}):')
 
     def selected_device_changed_callback(self, __none__=None, threaded=False) -> None:
         if threaded == False: # hack, i'm too lazy to asyncify tkinter
@@ -189,17 +206,9 @@ class AdbManager:
         gui = self.get_gui()
         logger = gui.get_logger()
 
-        devices_cbx = gui.get_element_by_opt_id(
-            ECoreElements.ADB_DEVICES
-        )
-
-        shell_label = gui.get_element_by_opt_id(
-            ECoreElements.ADB_SHELL_LABEL
-        )
-
-        selected_device = devices_cbx.get()
+        selected_device = self.devices_cbx.get()
         self.set_selected_device(selected_device)
 
-        shell_label.config(text=f'Shell ({selected_device}):')
+        self.shell_label.config(text=f'Shell ({selected_device}):')
 
         logger.info(f'[>] [adb] Changed device to {selected_device}\n')
