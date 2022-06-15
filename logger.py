@@ -81,6 +81,7 @@ class Logger:
             self.__logbox["state"] = "normal"
             self.__logbox.insert('end', message, tag)
             self.__logbox["state"] = "disable"
+            self.__logbox.yview_pickplace("end")
 
         def setup_logbox(logger):
             for color in logbox_level_colors.items(): 
