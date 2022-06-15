@@ -31,6 +31,10 @@ class AdbManager:
             self.__gui.get_adb_tab_bar(), 520, 360, 'Shell'
         )
 
+        self.__gui.get_adb_tab_bar().bind(
+            '<<NotebookTabChanged>>', self.__on_tab_changed
+        )
+
         self.__gui.create_label(
             self.__settings_tab, 20, 20, 'IP:'
         )
@@ -41,12 +45,12 @@ class AdbManager:
         self.__adb_server_ip.set('127.0.0.1')
         self.__adb_server_port.set('5037')
 
-        self.__gui.create_editbox(
+        self.__ip_ebx = self.__gui.create_editbox(
             self.__settings_tab, 20, 40, 
             self.__adb_server_ip, 100
         )
 
-        self.__gui.create_label(
+        self.__port_ebx = self.__gui.create_label(
             self.__settings_tab, 130, 20, 'Port:'
         )
 
@@ -71,8 +75,6 @@ class AdbManager:
             self.__selected_device_changed_callback,
             ECoreElements.ADB_DEVICES
         )
-
-        self.__devices_cbx.focus_set()
 
         self.__shell_label = self.__gui.create_label(
             self.__shell_tab, 20, 20, 
@@ -100,8 +102,6 @@ class AdbManager:
             self.__shell_tab, 410, 310, 'kill thread', 
             self.__invalidate_shell_cancelation_token, 90, 30
         )
-
-        self.__shell_executor.focus_set()
 
         self.__shell_terminal["state"] = "disabled"
         self.__shell_executor["state"] = "disabled"
@@ -144,6 +144,14 @@ class AdbManager:
     def set_selected_device(self, serial) -> None:
         self.__selected_device = serial
 
+    def __on_tab_changed(self, event):
+        current_tab_index = event.widget.index("current")
+        if current_tab_index == 0: # settings
+            self.__ip_ebx.selection_clear() # tk selection bug?
+            self.__settings_tab.focus_set()
+        elif current_tab_index == 1: # shell
+            self.__shell_executor.focus_set()
+
     def __refresh_shell_cancelation_token(self) -> None:
         self.__shell_cancelation_token = False
 
@@ -173,7 +181,7 @@ class AdbManager:
             mode='w', defaultextension=".txt",
         )
 
-        if file_path == '': return
+        if file_path == None: return
         
         file_cd, file_name = os.path.split(file_path.name)
 
