@@ -20,6 +20,11 @@ class ApkManager:
         self.__construct()
 
     def __construct(self) -> None:
+        self.__gui.get_root_tab_bar().bind(
+            '<<NotebookTabChanged>>',
+            self.__on_tab_changed
+        )
+
         self.__gui.create_button(
             self.__ui_root, 20, 20, "Decompile APK", 
             self.__decompile_apk_callback,
@@ -51,6 +56,10 @@ class ApkManager:
             self.__ui_root, -6, -7, 0, 0,
             ECoreElements.PROGRESS_BAR
         )
+
+    def __on_tab_changed(self, event):
+        if event.widget.index("current") == 0: # general tab
+            self.__apk_info_label.focus_set()
 
     def __decompile_apk_callback(self, __none__=None, threaded=False) -> None:
         if threaded == False: # hack, i'm too lazy to asyncify tkinter
