@@ -77,15 +77,20 @@ class AdbManager:
         )
 
         self.__shell_terminal = self.__gui.create_terminal(
-            self.__shell_tab, 20, 40, 480, 300, 
-            self.__shell_command_callback,
-            ECoreElements.ADB_SHELL_TERMINAL
+            self.__shell_tab, 20, 40, 480, 280, 
+            None, ECoreElements.ADB_SHELL_TERMINAL
         )
 
-        # self.shell_terminal.insert('end', '> ')
-        self.__shell_terminal.focus_set()
+        self.__shell_executor = self.__gui.create_terminal(
+            self.__shell_tab, 20, 320, 480, 20,
+            self.__shell_command_callback,
+            ECoreElements.ADB_SHELL_EXECUTOR
+        )
+
+        self.__shell_executor.focus_set()
 
         self.__shell_terminal["state"] = "disabled"
+        self.__shell_executor["state"] = "disabled"
         self.__devices_cbx["state"] = "disabled"
 
     def connect(self, host="127.0.0.1", port=5037):
@@ -125,6 +130,15 @@ class AdbManager:
     def set_selected_device(self, serial) -> None:
         self.__selected_device = serial
 
+    def __terminal_print(self, data, recv=False) -> None:
+        self.__shell_terminal["state"] = "normal"
+
+        output = f'> {data}\n' if recv == False else f'{data}\n'
+        self.__shell_terminal.insert('end', output)
+
+        self.__shell_terminal["state"] = "disabled"
+        self.__shell_terminal.yview_pickplace("end")
+
     def __on_device_lost(self) -> None:
         self.__logger.error('[ !] [adb] Lost device!\n')
         self.__devices_label.config(text='< no devices >')
@@ -132,7 +146,8 @@ class AdbManager:
         self.__devices_cbx["values"] = []
         self.__devices_cbx["state"] = "disabled"
         self.__shell_label.config(text='Device shell (connect to adb server and select device first):')
-        self.__shell_terminal["state"] = "disabled"
+        self.__terminal_print('lost device\n', True)
+        self.__shell_executor["state"] = "disabled"
         self.set_selected_device(None)
 
     def __shell_result_handler(self, connection) -> None:
@@ -140,8 +155,7 @@ class AdbManager:
             data = connection.read(1024)
             if not data:
                 break
-            self.__shell_terminal.insert('end', f'> {data.decode("utf-8")}\n')
-            self.__shell_terminal.yview_pickplace("end")
+            self.__terminal_print(data.decode("utf-8"), recv=True)
 
         connection.close()
 
@@ -154,10 +168,12 @@ class AdbManager:
             thread.start()
             return
 
-        terminal_content = self.__shell_terminal.get("1.0", "end-1c")
-        self.__shell_command = terminal_content.split('\n')[-2].strip()
-
+        self.__shell_command = self.__shell_executor.get("1.0", "end-1c").replace('\n', '')
         self.__logger.info(f'[>] [adb] Executing "{self.__shell_command}" on {self.__selected_device}\n')
+        self.__terminal_print(self.__shell_command)
+
+        # clearing command buffer
+        self.__shell_executor.delete('1.0', tk.END)
 
         device = self.__client.device(self.__selected_device)
 
@@ -193,7 +209,7 @@ class AdbManager:
         self.__devices_label.config(text='Devices list:')
 
         self.__devices_cbx["state"] = "readonly"
-        self.__shell_terminal["state"] = "normal"
+        self.__shell_executor["state"] = "normal"
         self.__devices_cbx["values"] = devices
         self.__devices_cbx.current(0)
 
