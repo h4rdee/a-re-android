@@ -87,6 +87,9 @@ class Window:
     def get_adb_tab_bar(self) -> ttk.Notebook:
         return self.__tab_bar_adb
 
+    def get_root_tab_bar(self) -> ttk.Notebook:
+        return self.__tab_bar_root
+
     def get_element_by_opt_id(self, opt_id) -> Any:
         el = self.__elements.get(opt_id)
         if el is None:
