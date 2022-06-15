@@ -21,4 +21,4 @@ I'm working on this project at spare time, which means that no regular support o
 ## Screenshots:
 ![image](https://user-images.githubusercontent.com/37783231/172968610-66a7b7bb-c127-4e5f-9d6a-7ea3d051cb53.png)
 ![image](https://user-images.githubusercontent.com/37783231/173279259-92ad82a2-38db-4fe6-8fe5-25d351a1aa5f.png)
-![image](https://user-images.githubusercontent.com/37783231/173561539-4a5106ac-1304-415a-bbd1-b4fcbd1f171d.png)
+![image](https://user-images.githubusercontent.com/37783231/173729652-23d51680-6c8a-4d3e-a13d-05601f801fd8.png)
