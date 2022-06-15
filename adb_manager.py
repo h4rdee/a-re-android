@@ -1,7 +1,10 @@
+import os
 import tkinter as tk
 
 from logger import g_logger
 from threading import Thread
+from tkinter import filedialog
+
 from ppadb.client import Client as AdbClient
 from ppadb.device import Device as AdbDevice
 
@@ -14,6 +17,7 @@ class AdbManager:
         self.__selected_device = None
         self.__ui_root = gui.get_adb_tab()
         self.__shell_command = tk.StringVar(self.__ui_root, '> ')
+        self.__shell_cancelation_token = False
         self.__gui = gui
         self.__logger = g_logger
         self.__construct()
@@ -77,14 +81,24 @@ class AdbManager:
         )
 
         self.__shell_terminal = self.__gui.create_terminal(
-            self.__shell_tab, 20, 40, 480, 280, 
+            self.__shell_tab, 20, 40, 480, 270, 
             None, ECoreElements.ADB_SHELL_TERMINAL
         )
 
         self.__shell_executor = self.__gui.create_terminal(
-            self.__shell_tab, 20, 320, 480, 20,
+            self.__shell_tab, 20, 310, 330, 30,
             self.__shell_command_callback,
             ECoreElements.ADB_SHELL_EXECUTOR
+        )
+
+        self.__save_terminal_btn = self.__gui.create_button(
+            self.__shell_tab, 350, 310, 'save',
+            self.__on_terminal_save, 60, 30
+        )
+
+        self.__kill_shell_thread_btn = self.__gui.create_button(
+            self.__shell_tab, 410, 310, 'kill thread', 
+            self.__invalidate_shell_cancelation_token, 90, 30
         )
 
         self.__shell_executor.focus_set()
@@ -130,6 +144,13 @@ class AdbManager:
     def set_selected_device(self, serial) -> None:
         self.__selected_device = serial
 
+    def __refresh_shell_cancelation_token(self) -> None:
+        self.__shell_cancelation_token = False
+
+    def __invalidate_shell_cancelation_token(self) -> None:
+        self.__logger.info('[>] [adb] Stopping shell thread..\n')
+        self.__shell_cancelation_token = True
+
     def __terminal_print(self, data, recv=False) -> None:
         self.__shell_terminal["state"] = "normal"
 
@@ -138,6 +159,39 @@ class AdbManager:
 
         self.__shell_terminal["state"] = "disabled"
         self.__shell_terminal.yview_pickplace("end")
+    
+    def __on_terminal_save(self, __none__=None, threaded=False) -> None:
+        if threaded == False: # hack, i'm too lazy to asyncify tkinter
+            thread = Thread(
+                target=self.__on_terminal_save, 
+                args=(self, True,)
+            )
+            thread.start()
+            return
+        
+        file_path = filedialog.asksaveasfile(
+            mode='w', defaultextension=".txt",
+        )
+
+        if file_path == '': return
+        
+        file_cd, file_name = os.path.split(file_path.name)
+
+        self.__logger.info(
+            f'[>] [adb] Saving terminal output to {file_name}\n'
+        )
+
+        with open(file_path.name, "w") as terminal_output:
+            terminal_content = str(
+                self.__shell_terminal.get("1.0", tk.END)
+            )
+
+            terminal_output.write(terminal_content)
+            terminal_output.close()
+
+            self.__logger.info(
+                f'[+] [adb] Saved terminal output to {file_name}\n'
+            )
 
     def __on_device_lost(self) -> None:
         self.__logger.error('[ !] [adb] Lost device!\n')
@@ -151,7 +205,7 @@ class AdbManager:
         self.set_selected_device(None)
 
     def __shell_result_handler(self, connection) -> None:
-        while True:
+        while self.__shell_cancelation_token == False:
             data = connection.read(1024)
             if not data:
                 break
@@ -170,6 +224,8 @@ class AdbManager:
 
         self.__shell_command = self.__shell_executor.get("1.0", "end-1c").replace('\n', '')
         self.__logger.info(f'[>] [adb] Executing "{self.__shell_command}" on {self.__selected_device}\n')
+
+        self.__refresh_shell_cancelation_token()
         self.__terminal_print(self.__shell_command)
 
         # clearing command buffer
