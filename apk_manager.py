@@ -109,7 +109,6 @@ class ApkManager:
         # logging
         self.__logger.info(f"[+] Decompiled apk: {g_current_file}\n")
 
-    #@staticmethod
     def __recompile_apk_callback(self, __none__=None,threaded=False) -> None:
         if threaded == False: # hack, i'm too lazy to asyncify tkinter
             thread = Thread(
