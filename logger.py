@@ -66,7 +66,7 @@ class Logger:
             self.install_output(LogOutput((lambda message, tag: print(message)), None))
 
     def construct(self, ui_root):
-        logbox = ui_root.get_element_by_opt_id(ECoreElements.LOGGER)
+        self.__logbox = ui_root.get_element_by_opt_id(ECoreElements.LOGGER)
 
         logbox_level_colors = {
             LogLevel.INFO.tag:     { "foreground": "#FFFFFF", "background": None    },
@@ -77,18 +77,20 @@ class Logger:
             LogLevel.ERROR.tag:    { "foreground": "red"    , "background": "black" }
         }
 
+        def recv(message, tag):
+            self.__logbox["state"] = "normal"
+            self.__logbox.insert('end', message, tag)
+            self.__logbox["state"] = "disable"
+
         def setup_logbox(logger):
             for color in logbox_level_colors.items(): 
-                logbox.tag_config(
+                self.__logbox.tag_config(
                     color[0], foreground=color[1]["foreground"],
                     background=color[1]["background"]
                 )
                 
         g_logger.install_output(
-            LogOutput(
-                (lambda message, tag: logbox.insert('end', message, tag)), 
-                setup_logbox
-            )
+            LogOutput(recv, setup_logbox)
         )
 
     def install_output(self, output):
