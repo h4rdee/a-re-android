@@ -11,7 +11,7 @@ Android applications reverse-engineering utility <br> (pretty simple at the mome
     - [Cocos2D plugin](https://github.com/h4rdee/a-re-android/wiki/%5BPlugin%5D-Cocos2D): capable of packing and unpacking jsc/jsc2/luac files used by Cocos2D engine
 
 ## How do i make my own plugins?
-- Please reffer to [wiki](https://github.com/h4rdee/a-re-android/wiki/How-to-write-your-own-plugin)
+- Please refer to [wiki](https://github.com/h4rdee/a-re-android/wiki/How-to-write-your-own-plugin)
 
 ## Notes:
 This project was made by me, and my python knowledge kinda sucks <br>
